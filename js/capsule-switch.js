@@ -7,7 +7,7 @@
     '02': { title:'obras',   kicker:'CREACIONES',  lead:'Doce piezas habitan un espacio panorámico de 360°. Entra, escucha, vuelve. Cada obra vive en su propio nicho dentro de la sala.' },
     '03': { title:'proceso', kicker:'LABORATORIO', lead:'Tres instrumentos abiertos en el navegador. Mueve, escucha, exporta. Lo que hagas queda guardado en el archivo del colectivo.' },
     '04': { title:'voces',   kicker:'COMUNIDAD',   lead:'Foro y archivo vivo de 142 voces. 38 hilos activos sobre arte, código, errores y obsesiones compartidas.' },
-    '05': { title:'archivo', kicker:'INVITACIÓN',  lead:'El archivo es de todos. Sube tu cápsula — proceso, error, boceto. Sin curaduría, sin filtros, sin fechas.' },
+    '05': { title:'archivo', kicker:'ARCHIVO',     lead:'Todo lo que se crea aquí queda. El archivo colectivo de procesos, errores y experimentos del laboratorio.' },
   };
 
   const scanFx = document.getElementById('scanFx');

@@ -63,7 +63,7 @@
     <div class="nav-links">
       <a href="#" class="active">Inicio</a>
       <a href="#" data-comment-anchor="5dd4c3e5a3-a">Galería 360</a>
-      <a href="#">Laboratorio</a>
+      <a href="laboratorio.html">Laboratorio</a>
       <a href="foro.html">Foro</a>
       <button class="audio-btn" id="audioBtn" aria-label="Audio del sitio" data-comment-anchor="70389dc826-button">
         <span class="bars"><i></i><i></i><i></i><i></i></span>
@@ -136,8 +136,8 @@
       </button>
       <button class="node" data-cap="05" role="tab">
         <span class="n">05</span>
-        <span class="t">Invitación</span>
-        <span class="desc">Sube tu propia cápsula al archivo.</span>
+        <span class="t">Archivo</span>
+        <span class="desc">Lo que la comunidad ha creado.</span>
       </button>
     </div>
   </div>
@@ -333,36 +333,24 @@
       </div>
     </section>
 
-    <!-- CAP 05: INVITACIÓN -->
-    <section class="cap-body" data-cap-body="05" data-screen-label="Cap 05 Invitacion">
+    <!-- CAP 05: ARCHIVO COLECTIVO -->
+    <section class="cap-body" data-cap-body="05" data-screen-label="Cap 05 Archivo">
       <div class="cap-head">
-        <h2 class="ttl"><small>// cápsula 05 — archivo abierto</small>INVITACIÓN.</h2>
+        <h2 class="ttl"><small>// cápsula 05 — archivo colectivo</small>ARCHIVO.</h2>
         <div class="meta">
-          envíos en curso  ·  sin curaduría<br>
-          <b>● recepción abierta</b><br>
-          máx 200 mb por pieza
+          <span id="cap05-count">…</span><br>
+          <b>● activo</b><br>
+          actualizado en tiempo real
         </div>
       </div>
-      <div class="invite">
-        <div class="invite-kicker"><span class="label">// archivo colectivo</span></div>
-        <h2>Sube tu propia<br><em>creación</em>.</h2>
-        <p>Proceso, error, boceto, idea perdida. Lo que tengas. Todo entra al archivo común del colectivo — sin curaduría, sin filtros.</p>
-        <div class="dropzone">
-          <div class="icon">↓</div>
-          <div class="ttl">Arrastra archivo aquí</div>
-          <div class="sub">o haz clic para seleccionar</div>
-        </div>
-        <div class="invite-formats">
-          <span>video / mp4 mov</span>
-          <span>audio / wav mp3</span>
-          <span>texto / md txt</span>
-          <span>imagen / png jpg</span>
-          <span>código / cualquiera</span>
-        </div>
-        <div class="invite-cta">
-          <button class="btn btn--neon">Empezar envío <span class="arrow">→</span></button>
-          <button class="btn">Ver políticas</button>
-        </div>
+      <p class="cap05-subtitle">
+        Todo lo que se crea aquí queda. Esto es lo que la comunidad ha hecho hasta ahora.
+      </p>
+      <div id="cap05-grid" class="archivo-grid">
+        <div class="loading-line">cargando piezas…</div>
+      </div>
+      <div style="margin-top:36px;text-align:center">
+        <a href="laboratorio.html" class="btn btn--neon">Crear la tuya <span class="arrow">→</span></a>
       </div>
     </section>
 
@@ -421,6 +409,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script defer src="js/supabase-client.js"></script>
   <script defer src="js/cap04-realtime.js"></script>
+  <script defer src="js/cap05-realtime.js"></script>
 
 </body>
 </html>

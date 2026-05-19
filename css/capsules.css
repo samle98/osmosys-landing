@@ -33,3 +33,35 @@
   color:var(--ink-dim);line-height:1.8;
 }
 .cap-head .meta b{color:var(--neon);font-weight:400}
+
+/* ── Cápsula 05: archivo colectivo ──────────────────────── */
+.cap05-subtitle{
+  font-size:16px;line-height:1.55;color:var(--ink-dim);
+  margin-bottom:28px;max-width:680px;
+}
+.archivo-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
+  margin-bottom:32px;
+}
+.archivo-item{
+  border:1px solid var(--line-2);background:var(--bg-2);
+  overflow:hidden;cursor:none;transition:border-color .2s;
+}
+.archivo-item:hover{border-color:var(--neon)}
+.archivo-thumb{
+  aspect-ratio:4/3;background-size:cover;background-position:center;
+  background-color:#060606;
+}
+.archivo-meta{
+  padding:8px 10px;display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.18em;
+  border-top:1px solid var(--line);
+}
+.archivo-modo{color:var(--neon)}
+.archivo-time{color:var(--ink-mute)}
+.cap05-empty{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;
+  color:var(--ink-dim);text-align:center;padding:60px 20px;
+  border:1px dashed var(--line-2);grid-column:1/-1;
+}
+.cap05-empty a{color:var(--neon)}

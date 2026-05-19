@@ -1,0 +1,178 @@
+/* ============================================================
+   laboratorio.css — página del laboratorio interactivo
+   ============================================================ */
+
+/* ── Layout principal ────────────────────────────────────── */
+.lab-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 110px 6% 100px;
+  min-height: 100vh;
+}
+
+/* ── Cabecera ────────────────────────────────────────────── */
+.lab-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 40px;
+  margin-bottom: 32px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--line);
+}
+
+.lab-page-title {
+  font-family: var(--font-display);
+  font-size: 84px;
+  line-height: 0.9;
+  letter-spacing: 0.01em;
+}
+
+.lab-page-title small {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .24em;
+  color: var(--ink-dim);
+  margin-bottom: 14px;
+  font-weight: 400;
+}
+
+.lab-page-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-shrink: 0;
+}
+
+.lab-status {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .18em;
+  color: var(--neon);
+  opacity: 0;
+  transition: opacity .3s;
+  max-width: 260px;
+  text-align: right;
+}
+
+/* ── Marco completo ──────────────────────────────────────── */
+.lab-frame-full {
+  border: 1px solid var(--line-2);
+  background: #050505;
+  overflow: hidden;
+}
+
+/* ── Canvas wrapper ──────────────────────────────────────── */
+.lab-canvas-wrap {
+  position: relative;
+  height: 520px;
+  background: #060606;
+  overflow: hidden;
+}
+
+.lab-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── HUD / panel de control ──────────────────────────────── */
+.lab-hud-area {
+  display: flex;
+  align-items: stretch;
+  border-top: 1px solid var(--line);
+  min-height: 80px;
+}
+
+.lab-hud-panel {
+  padding: 20px 28px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex: 1;
+}
+
+/* Instrucciones de modo */
+.lab-instructions {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  max-width: 280px;
+}
+
+.lab-instructions::before {
+  content: "// ";
+  color: var(--neon);
+}
+
+/* ── Readout (sintetizador) ──────────────────────────────── */
+/* lab.css ya define .lab-readout — aquí solo override para el HUD */
+.lab-hud-panel .lab-readout {
+  position: static;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .18em;
+  color: var(--ink-dim);
+  line-height: 1.9;
+}
+
+/* ── Sliders (modo partícula) ────────────────────────────── */
+.lab-sliders {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+
+.lab-slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 140px;
+}
+
+.lab-slider-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  display: flex;
+  justify-content: space-between;
+}
+
+.lab-slider-label span {
+  color: var(--neon);
+}
+
+.lab-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 2px;
+  background: var(--line-2);
+  outline: none;
+  cursor: none;
+}
+
+.lab-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  background: var(--neon);
+  border: none;
+  box-shadow: 0 0 8px var(--neon);
+}
+
+.lab-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: var(--neon);
+  border: none;
+  box-shadow: 0 0 8px var(--neon);
+  border-radius: 0;
+}

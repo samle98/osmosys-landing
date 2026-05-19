@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Laboratorio — Osmosys</title>
+  <meta name="viewport" content="width=1440">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/cursor.css">
+  <link rel="stylesheet" href="css/nav.css">
+  <link rel="stylesheet" href="css/lab.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/laboratorio.css">
+</head>
+<body>
+
+  <!-- CUSTOM CURSOR -->
+  <div class="cursor-ring" id="cursorRing"></div>
+  <div class="cursor-dot"  id="cursorDot"></div>
+
+  <!-- NAVBAR -->
+  <nav class="nav">
+    <a class="logo" href="index.html">
+      <img src="assets/logo-white.png" alt="Osmosys">
+      <span class="word">OSMOSYS</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Inicio</a>
+      <a href="#">Galería 360</a>
+      <a href="laboratorio.html" class="active">Laboratorio</a>
+      <a href="foro.html">Foro</a>
+      <button class="audio-btn" id="audioBtn" aria-label="Audio del sitio">
+        <span class="bars"><i></i><i></i><i></i><i></i></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="lab-page">
+
+    <header class="lab-page-header">
+      <h1 class="lab-page-title">
+        <small>// cápsula 03 — laboratorio interactivo</small>
+        PROCESO.
+      </h1>
+      <div class="lab-page-actions">
+        <span id="labStatus" class="lab-status"></span>
+        <button id="btnSave" class="btn btn--neon">
+          Guardar pieza <span class="arrow">↓</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="lab-frame lab-frame-full">
+
+      <!-- Barra de modos -->
+      <div class="lab-toolbar">
+        <span class="on" data-mode="sintetizador">// sintetizador</span>
+        <span data-mode="particula">partícula</span>
+        <span data-mode="tinta">tinta</span>
+      </div>
+
+      <!-- Canvases (uno por modo) -->
+      <div class="lab-canvas-wrap">
+        <canvas id="canvas-sintetizador" class="lab-canvas"></canvas>
+        <canvas id="canvas-particula"   class="lab-canvas" style="display:none"></canvas>
+        <canvas id="canvas-tinta"       class="lab-canvas" style="display:none"></canvas>
+      </div>
+
+      <!-- HUD: un panel por modo -->
+      <div class="lab-hud-area">
+
+        <!-- Sintetizador: readout + instrucciones + knobs decorativos -->
+        <div id="hud-sintetizador" class="lab-hud-panel">
+          <div class="lab-readout">
+            freq &nbsp;<b id="readout-freq">220.5 hz</b><br>
+            gain &nbsp;<b id="readout-gain">-12 db</b><br>
+            modul <b id="readout-modul">0.34</b>
+          </div>
+          <span class="lab-instructions">Arrastra los tres puntos para modificar la onda</span>
+          <div class="lab-knobs">
+            <div class="knob k1"></div>
+            <div class="knob k2"></div>
+            <div class="knob k3"></div>
+          </div>
+        </div>
+
+        <!-- Partícula: sliders + instrucciones -->
+        <div id="hud-particula" class="lab-hud-panel" style="display:none">
+          <div class="lab-sliders">
+            <div class="lab-slider-group">
+              <label class="lab-slider-label" for="slider-cantidad">
+                cantidad <span id="slider-cantidad-val">80</span>
+              </label>
+              <input type="range" id="slider-cantidad"
+                class="lab-slider" min="10" max="300" step="5" value="80">
+            </div>
+            <div class="lab-slider-group">
+              <label class="lab-slider-label" for="slider-velocidad">
+                velocidad <span id="slider-velocidad-val">4</span>
+              </label>
+              <input type="range" id="slider-velocidad"
+                class="lab-slider" min="1" max="20" step="0.5" value="4">
+            </div>
+            <div class="lab-slider-group">
+              <label class="lab-slider-label" for="slider-dispersion">
+                dispersión <span id="slider-dispersion-val">3</span>
+              </label>
+              <input type="range" id="slider-dispersion"
+                class="lab-slider" min="1" max="50" step="1" value="3">
+            </div>
+          </div>
+          <span class="lab-instructions">Mueve el mouse sobre el canvas para emitir partículas</span>
+        </div>
+
+        <!-- Tinta: instrucciones + botón limpiar -->
+        <div id="hud-tinta" class="lab-hud-panel" style="display:none">
+          <span class="lab-instructions">Pinta con el mouse — lento: grueso &nbsp;·&nbsp; rápido: fino</span>
+          <button id="btnClearTinta" class="btn"
+            style="padding:10px 18px;font-size:10px;letter-spacing:.18em">
+            Limpiar canvas
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="foot">
+    <span>© OSMOSYS 2026</span>
+    <div class="right">
+      <a href="#">RSS</a>
+      <a href="#">Mastodon</a>
+      <a href="#">Newsletter</a>
+      <a href="#">Contacto</a>
+    </div>
+  </footer>
+
+  <!-- Scripts: Supabase primero (sin defer), luego motores defer en orden -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script defer src="js/supabase-client.js"></script>
+  <script defer src="js/cursor.js"></script>
+  <script defer src="js/audio-toggle.js"></script>
+  <script defer src="js/lab-core.js"></script>
+  <script defer src="js/lab-synth.js"></script>
+  <script defer src="js/lab-particles.js"></script>
+  <script defer src="js/lab-tinta.js"></script>
+
+</body>
+</html>
