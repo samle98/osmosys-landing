@@ -1,7 +1,6 @@
-// lab-particles.js — modo partícula: campo de flujo Perlin.
-// Base: flujo inspirado en el sistema original. Reescrito en Canvas 2D
-// vanilla (sin p5.js). Optimizaciones: Float32Array para el campo,
-// caché de color por partícula, campo actualizado cada 2 frames.
+// lab-particles.js — campo de flujo Perlin, modo partícula.
+// Fix: lazy-init al hacerse visible (canvas oculto → offsetWidth=0 al arranque).
+// Forma: círculo fijo. Modos: flujo y caos. Mirror 4-way toggle.
 
 (() => {
   const canvas = document.getElementById('canvas-particula');
@@ -27,29 +26,27 @@
     const X = Math.floor(x) & 255, Y = Math.floor(y) & 255, Z = Math.floor(z) & 255;
     x -= Math.floor(x); y -= Math.floor(y); z -= Math.floor(z);
     const u = _fade(x), v = _fade(y), w = _fade(z);
-    const A = _P[X] + Y, AA = _P[A] + Z, AB = _P[A + 1] + Z;
-    const B = _P[X + 1] + Y, BA = _P[B] + Z, BB = _P[B + 1] + Z;
+    const A = _P[X] + Y, AA = _P[A] + Z, AB = _P[A+1] + Z;
+    const B = _P[X+1]+Y, BA = _P[B]+Z, BB = _P[B+1]+Z;
     const lr = (a, b, t) => a + t * (b - a);
     return lr(
-      lr(lr(_g(_P[AA],x,y,z),   _g(_P[BA],x-1,y,z),  u),
-         lr(_g(_P[AB],x,y-1,z), _g(_P[BB],x-1,y-1,z),u), v),
-      lr(lr(_g(_P[AA+1],x,y,z-1),   _g(_P[BA+1],x-1,y,z-1),  u),
-         lr(_g(_P[AB+1],x,y-1,z-1), _g(_P[BB+1],x-1,y-1,z-1),u), v), w);
+      lr(lr(_g(_P[AA],x,y,z), _g(_P[BA],x-1,y,z), u),
+         lr(_g(_P[AB],x,y-1,z), _g(_P[BB],x-1,y-1,z), u), v),
+      lr(lr(_g(_P[AA+1],x,y,z-1), _g(_P[BA+1],x-1,y,z-1), u),
+         lr(_g(_P[AB+1],x,y-1,z-1), _g(_P[BB+1],x-1,y-1,z-1), u), v), w);
   }
 
   // ── Estado ────────────────────────────────────────────────
   let W = 0, H = 0, frame = 0, zOff = 0;
   const CELL = 20;
   let cols = 0, rows = 0;
-  let field; // Float32Array(cols*rows*2): [vx, vy, …]
+  let field; // Float32Array(cols*rows*2)
   let particles = [];
   let mouseX = -1, mouseY = -1;
+  let mode      = 'flow'; // 'flow' | 'chaos'
+  let mirrorMode = false;
 
-  let shape = 'line'; // 'circle' | 'line' | 'cross'
-  let mode  = 'flow'; // 'flow' | 'radial' | 'chaos'
-
-  // Parámetros leídos de sliders + constantes internas
-  const P = { count: 200, speed: 3, scale: 12, hue: 80, alpha: 50, hueVar: 30, fade: 8 };
+  const P = { count: 200, speed: 3, scale: 12, hue: 80 };
 
   // ── Campo de flujo ────────────────────────────────────────
   function initField() {
@@ -59,15 +56,13 @@
   }
 
   function updateField() {
-    const sc  = P.scale * 0.003;
-    const spd = P.speed * 0.45;
+    const sc = P.scale * 0.003, spd = P.speed * 0.45;
     for (let x = 0; x < cols; x++) {
       for (let y = 0; y < rows; y++) {
         const idx = (x + y * cols) * 2;
-        let angle;
-        if      (mode === 'flow')   angle = noise(x * sc, y * sc, zOff) * Math.PI * 4.5;
-        else if (mode === 'radial') angle = Math.atan2(y - rows / 2, x - cols / 2) + noise(x * sc, y * sc, zOff) * 1.4;
-        else                        angle = noise(x * sc * 2.2, y * sc * 2.2, zOff * 1.8) * Math.PI * 9;
+        const angle = mode === 'flow'
+          ? noise(x * sc, y * sc, zOff) * Math.PI * 4.5
+          : noise(x * sc * 2.2, y * sc * 2.2, zOff * 1.8) * Math.PI * 9;
         field[idx]     = Math.cos(angle) * spd;
         field[idx + 1] = Math.sin(angle) * spd;
       }
@@ -75,82 +70,64 @@
     zOff += 0.003;
   }
 
-  // ── Clase Partícula ───────────────────────────────────────
+  // ── Partícula ─────────────────────────────────────────────
   class Particle {
     constructor() {
-      this.x  = Math.random() * W;  this.y  = Math.random() * H;
+      this.x  = Math.random() * W; this.y  = Math.random() * H;
       this.vx = (Math.random() - .5) * 2; this.vy = (Math.random() - .5) * 2;
       this.px = this.x; this.py = this.y;
-      this.hs  = (Math.random() - .5) * 50; // hue shift personal
-      this.sz  = 0.6 + Math.random() * 1.6;
-      this.ms  = 2.5 + Math.random() * 2;   // maxSpeed
-      this.ca  = Math.floor(Math.random() * 15); // color age (stagger)
+      this.hs = (Math.random() - .5) * 50;
+      this.sz = 0.8 + Math.random() * 1.4;
+      this.ms = 2.5 + Math.random() * 2;
+      this.ca = Math.floor(Math.random() * 15);
       this.col = '';
     }
-
     update() {
-      const cx = Math.min(cols - 1, Math.max(0, this.x / CELL | 0));
-      const cy = Math.min(rows - 1, Math.max(0, this.y / CELL | 0));
+      const cx = Math.min(cols-1, Math.max(0, this.x / CELL | 0));
+      const cy = Math.min(rows-1, Math.max(0, this.y / CELL | 0));
       const fi = (cx + cy * cols) * 2;
-      this.vx += field[fi]; this.vy += field[fi + 1];
-
-      // Influencia del mouse: repulsión suave
+      this.vx += field[fi]; this.vy += field[fi+1];
       if (mouseX >= 0) {
         const dx = this.x - mouseX, dy = this.y - mouseY;
-        const d2 = dx * dx + dy * dy;
+        const d2 = dx*dx + dy*dy;
         if (d2 < 7200 && d2 > 1) {
           const d = Math.sqrt(d2);
-          const f = 2.2 / (d * 0.025 + 0.5);
-          this.vx += dx / d * f; this.vy += dy / d * f;
+          this.vx += dx/d * (2.2/(d*0.025+0.5));
+          this.vy += dy/d * (2.2/(d*0.025+0.5));
         }
       }
-
-      // Límite de velocidad
-      const spd = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
-      if (spd > this.ms) { this.vx = this.vx / spd * this.ms; this.vy = this.vy / spd * this.ms; }
-
+      const spd = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
+      if (spd > this.ms) { this.vx = this.vx/spd*this.ms; this.vy = this.vy/spd*this.ms; }
       this.px = this.x; this.py = this.y;
       this.x += this.vx; this.y += this.vy;
-
-      // Wrap edges
       if (this.x > W) { this.x = 0; this.px = 0; }
       else if (this.x < 0) { this.x = W; this.px = W; }
       if (this.y > H) { this.y = 0; this.py = 0; }
       else if (this.y < 0) { this.y = H; this.py = H; }
     }
-
     draw() {
-      // Caché de color: recalcular cada 15 frames (staggered)
       if (++this.ca % 15 === 0 || !this.col) {
-        const h = ((P.hue + this.hs + P.hueVar * Math.sin(frame * 0.008 + this.hs * 0.1)) % 360 + 360) % 360;
-        this.col = `hsla(${h | 0},60%,74%,${P.alpha / 100})`;
+        const h = ((P.hue + this.hs + 30 * Math.sin(frame*0.008+this.hs*0.1)) % 360 + 360) % 360;
+        this.col = `hsla(${h|0},62%,74%,0.5)`;
       }
-      ctx.strokeStyle = this.col;
-      ctx.fillStyle   = this.col;
-      ctx.lineWidth   = this.sz;
-
-      if (shape === 'circle') {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.sz * 0.75, 0, Math.PI * 2);
-        ctx.fill();
-      } else if (shape === 'line') {
-        ctx.beginPath();
-        ctx.moveTo(this.px, this.py);
-        ctx.lineTo(this.x, this.y);
-        ctx.stroke();
-      } else {
-        const s = this.sz * 3;
-        ctx.beginPath();
-        ctx.moveTo(this.x - s, this.y); ctx.lineTo(this.x + s, this.y);
-        ctx.moveTo(this.x, this.y - s); ctx.lineTo(this.x, this.y + s);
-        ctx.stroke();
+      ctx.fillStyle = this.col;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.sz * 0.75, 0, Math.PI * 2);
+      ctx.fill();
+      // Mirror
+      if (mirrorMode) {
+        ctx.beginPath(); ctx.arc(W - this.x, this.y, this.sz*0.75, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(this.x, H - this.y, this.sz*0.75, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(W - this.x, H - this.y, this.sz*0.75, 0, Math.PI*2); ctx.fill();
       }
     }
   }
 
-  // ── Lifecycle ─────────────────────────────────────────────
+  // ── Resize (lazy-safe) ────────────────────────────────────
   function resize() {
-    W = canvas.offsetWidth; H = canvas.offsetHeight;
+    const w = canvas.offsetWidth, h = canvas.offsetHeight;
+    if (!w || !h) return;
+    W = w; H = h;
     canvas.width = W; canvas.height = H;
     initField();
     particles = Array.from({ length: P.count }, () => new Particle());
@@ -161,30 +138,28 @@
   // ── Bucle de render ───────────────────────────────────────
   function draw() {
     if (canvas.style.display === 'none') { requestAnimationFrame(draw); return; }
+    // Lazy-init: el canvas estaba oculto cuando se llamó resize() inicialmente
+    if (!W || canvas.width !== canvas.offsetWidth || canvas.height !== canvas.offsetHeight) {
+      resize();
+      if (!W) { requestAnimationFrame(draw); return; }
+    }
     frame++;
 
-    // Leer sliders
-    const newCount = parseInt(document.getElementById('slider-cantidad')?.value ?? P.count);
+    P.count = parseInt(document.getElementById('slider-cantidad')?.value  ?? P.count);
     P.speed = parseFloat(document.getElementById('slider-velocidad')?.value ?? P.speed);
     P.scale = parseFloat(document.getElementById('slider-dispersion')?.value ?? P.scale);
-    P.hue   = parseFloat(document.getElementById('slider-hue')?.value ?? P.hue);
+    P.hue   = parseFloat(document.getElementById('slider-hue')?.value  ?? P.hue);
 
-    // Ajustar número de partículas
-    while (particles.length < newCount) particles.push(new Particle());
-    while (particles.length > newCount) particles.pop();
-    P.count = newCount;
+    while (particles.length < P.count) particles.push(new Particle());
+    while (particles.length > P.count) particles.pop();
 
-    // Actualizar campo cada 2 frames
     if (frame % 2 === 0) updateField();
 
-    // Fade de fondo (trail)
-    ctx.fillStyle = `rgba(6,6,6,${P.fade / 250})`;
+    ctx.fillStyle = 'rgba(6,6,6,0.032)';
     ctx.fillRect(0, 0, W, H);
 
-    // Dibujar todas las partículas
     for (const p of particles) { p.update(); p.draw(); }
 
-    // Readout
     if (frame % 30 === 0) {
       const cEl = document.getElementById('readout-count');
       const vEl = document.getElementById('readout-vel');
@@ -193,44 +168,36 @@
       if (vEl) vEl.textContent = P.speed.toFixed(1);
       if (dEl) dEl.textContent = P.scale.toFixed(0);
     }
-
     requestAnimationFrame(draw);
   }
 
-  // ── Interacción ───────────────────────────────────────────
+  // ── Eventos ───────────────────────────────────────────────
   canvas.addEventListener('mousemove',  e => { mouseX = e.offsetX; mouseY = e.offsetY; });
   canvas.addEventListener('mouseleave', () => { mouseX = -1; mouseY = -1; });
 
-  // Toggles de forma
-  document.querySelectorAll('[data-shape]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      shape = btn.dataset.shape;
-      document.querySelectorAll('[data-shape]').forEach(b => b.classList.toggle('active', b === btn));
-    });
-  });
-
-  // Toggles de modo de campo
   document.querySelectorAll('[data-field-mode]').forEach(btn => {
     btn.addEventListener('click', () => {
       mode = btn.dataset.fieldMode;
-      zOff = Math.random() * 100; // transición limpia
+      zOff = Math.random() * 100;
       document.querySelectorAll('[data-field-mode]').forEach(b => b.classList.toggle('active', b === btn));
     });
   });
 
-  // Actualizar spans de valor al mover sliders
+  document.getElementById('btnMirror')?.addEventListener('click', () => {
+    mirrorMode = !mirrorMode;
+    document.getElementById('btnMirror')?.classList.toggle('active', mirrorMode);
+  });
+
   [['slider-cantidad','slider-cantidad-val'],
    ['slider-velocidad','slider-velocidad-val'],
    ['slider-dispersion','slider-dispersion-val'],
    ['slider-hue','slider-hue-val']].forEach(([slId, valId]) => {
-    const sl  = document.getElementById(slId);
-    const val = document.getElementById(valId);
+    const sl = document.getElementById(slId), val = document.getElementById(valId);
     if (sl && val) sl.addEventListener('input', () => { val.textContent = sl.value; });
   });
 
-  window.addEventListener('resize', resize);
-  resize();
-  draw();
+  window.addEventListener('resize', () => { W = 0; resize(); });
+  draw(); // no resize() aquí: canvas está oculto, se iniciará en el primer frame visible
 
   if (typeof LAB !== 'undefined') LAB.register('particula', canvas);
 })();

@@ -1,6 +1,8 @@
-// lab-synth.js — modo sintetizador.
-// Onda multi-armónica con efecto de brillo fósforo CRT.
-// 3 puntos de control: frecuencia, ganancia, modulación.
+// lab-synth.js — Chromafield: visualización sinestésica.
+// Cada parámetro controla 3+ canales visuales simultáneamente.
+// Punto 0 → frecuencia (hue, velocidad, conteo de anillos)
+// Punto 1 → ganancia  (tamaño, brillo, amplitud de ondulación)
+// Punto 2 → modulación (complejidad, saturación, forma Lissajous)
 
 (() => {
   const canvas = document.getElementById('canvas-sintetizador');
@@ -8,17 +10,22 @@
   const ctx = canvas.getContext('2d');
 
   let W = 0, H = 0, t = 0;
+  let prevLX, prevLY; // posición anterior del trazo Lissajous
 
-  // Puntos de control normalizados (0..1)
   const pts = [
-    { x: 0.20, y: 0.50, dragging: false }, // freq
-    { x: 0.50, y: 0.26, dragging: false }, // gain
-    { x: 0.80, y: 0.50, dragging: false }, // modul
+    { x: 0.20, y: 0.50, dragging: false },
+    { x: 0.50, y: 0.24, dragging: false },
+    { x: 0.78, y: 0.50, dragging: false },
   ];
 
   function resize() {
-    W = canvas.offsetWidth; H = canvas.offsetHeight;
+    const w = canvas.offsetWidth, h = canvas.offsetHeight;
+    if (!w || !h) return;
+    W = w; H = h;
     canvas.width = W; canvas.height = H;
+    prevLX = undefined; prevLY = undefined;
+    ctx.fillStyle = '#060606';
+    ctx.fillRect(0, 0, W, H);
   }
 
   function neon() {
@@ -27,131 +34,136 @@
 
   function params() {
     return {
-      freq:  pts[0].x * 7.5 + 0.8,      // 0.8 – 8.3 ciclos
-      gain:  (0.5 - pts[1].y) * 1.7,     // -0.85 – 0.85
-      modul: pts[2].x,                   // 0 – 1
+      freq:  pts[0].x * 7.5 + 0.8,
+      gain:  Math.max(0.05, (0.5 - pts[1].y) * 2),
+      modul: pts[2].x,
     };
   }
 
-  // ── Forma de onda multi-armónica ──────────────────────────
-  function waveY(x, time) {
-    const { freq, gain, modul } = params();
-    const n = x / W;
-    // Fundamental
-    const f1 = Math.sin(n * Math.PI * 2 * freq + time * 1.8) * gain;
-    // 2.º armónico (enriquece la forma)
-    const f2 = Math.sin(n * Math.PI * 4 * freq + time * 2.2 + modul * Math.PI) * gain * 0.30;
-    // Onda de modulación (micro-ondulación)
-    const fm = Math.sin(n * Math.PI * 5 * modul + time * 1.5) * 0.10 * modul;
-    return H * 0.5 + (f1 + f2 + fm) * H * 0.31;
-  }
-
-  // ── Onda secundaria (portadora) ───────────────────────────
-  function carrierY(x, time) {
-    const { freq, modul } = params();
-    const n = x / W;
-    return H * 0.5 + Math.sin(n * Math.PI * 2 * (modul * 3 + 0.5) + time * 2.8) * H * 0.06;
-  }
-
-  // ── Fondo: pantalla osciloscópica ─────────────────────────
-  function drawBackground(c) {
-    ctx.clearRect(0, 0, W, H);
-
-    // Scanlines suaves
-    ctx.strokeStyle = 'rgba(232,228,220,0.025)';
-    ctx.lineWidth = 1;
-    for (let y = 0; y < H; y += 6) {
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-    }
-
-    // Grid menor
-    ctx.strokeStyle = c + '09';
-    for (let x = 0; x < W; x += 60) {
-      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-    }
-    for (let y = 0; y < H; y += 60) {
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-    }
-
-    // Línea central
-    ctx.strokeStyle = c + '18';
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(0, H / 2); ctx.lineTo(W, H / 2); ctx.stroke();
-  }
-
-  // ── Dibuja una onda con N pasadas (efecto fósforo CRT) ────
-  function drawWavePasses(fn, c, time, passes) {
-    for (const { width, alpha, blur } of passes) {
-      ctx.save();
-      ctx.shadowBlur  = blur;
-      ctx.shadowColor = c;
-      ctx.strokeStyle = c + alpha;
-      ctx.lineWidth   = width;
-      ctx.beginPath();
-      for (let x = 0; x <= W; x += 2) {
-        const y = fn(x, time);
-        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-      ctx.restore();
-    }
-  }
-
-  // ── Puntos de control ─────────────────────────────────────
-  function drawPoints(c) {
-    pts.forEach(p => {
-      const px = p.x * W, py = p.y * H;
-
-      // Guía punteada vertical
-      ctx.save();
-      ctx.strokeStyle = c + '20';
-      ctx.lineWidth = 1;
-      ctx.setLineDash([4, 7]);
-      ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, H); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.restore();
-
-      // Anillo exterior pulsante
-      const pulse = 0.6 + 0.4 * Math.sin(t * 2 + pts.indexOf(p));
-      ctx.save();
-      ctx.strokeStyle = c + Math.round(pulse * 0x33).toString(16).padStart(2,'0');
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.arc(px, py, 16, 0, Math.PI * 2); ctx.stroke();
-      ctx.restore();
-
-      // Punto sólido
-      ctx.save();
-      ctx.fillStyle   = c;
-      ctx.shadowBlur  = p.dragging ? 22 : 12;
-      ctx.shadowColor = c;
-      ctx.beginPath(); ctx.arc(px, py, p.dragging ? 8 : 5, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
-    });
-  }
-
-  // ── Barras de espectro decorativas ────────────────────────
-  function drawSpectrum(c, time) {
-    const { freq, gain } = params();
-    const barW = 3, gap = 2, n = 32;
-    const startX = (W - n * (barW + gap)) / 2;
-    const maxH   = H * 0.06;
+  // ── Núcleo central pulsante ───────────────────────────────
+  function drawCore(cx, cy, freq, gain, hue, time) {
+    const r = 18 + gain * 65 * (0.85 + 0.15 * Math.sin(time * 3.5));
     ctx.save();
-    ctx.globalAlpha = 0.35;
-    for (let i = 0; i < n; i++) {
-      const h = maxH * Math.abs(Math.sin(i * 0.4 + freq + time * 0.8)) * (0.5 + Math.abs(gain) * 0.8);
-      const x = startX + i * (barW + gap);
-      const y = H - 12 - h;
-      ctx.fillStyle = c;
-      ctx.shadowBlur  = 6;
-      ctx.shadowColor = c;
-      ctx.fillRect(x, y, barW, h);
+    ctx.globalCompositeOperation = 'screen';
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+    g.addColorStop(0,   `hsla(${hue},80%,80%,${gain * 0.9})`);
+    g.addColorStop(0.4, `hsla(${hue},70%,55%,${gain * 0.45})`);
+    g.addColorStop(1,   `hsla(${hue},70%,40%,0)`);
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // ── Anillos cromáticos modulados ──────────────────────────
+  // El número de anillos varía con freq; la ondulación con gain y modul.
+  function drawRings(cx, cy, freq, gain, modul, hue, time) {
+    const numRings = Math.round(freq * 1.4 + 4);   // 5–16 anillos
+    const maxR     = Math.min(W, H) * 0.46;
+    const wobbleCycles = Math.round(freq * 2) * 2 + 2; // siempre par → simetría
+    const tSpeed   = 1 + freq * 0.4;               // freq → velocidad de animación
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+
+    for (let i = 0; i < numRings; i++) {
+      const phase   = (i + 1) / numRings;
+      const baseR   = phase * maxR;
+      const ringHue = (hue + i * (25 + modul * 20)) % 360;
+      const alpha   = (1 - phase * 0.65) * (0.28 + gain * 0.55);
+      const wobbleA = gain * baseR * 0.28;
+
+      ctx.beginPath();
+      const steps = 90;
+      for (let s = 0; s <= steps; s++) {
+        const angle   = (s / steps) * Math.PI * 2;
+        const wobble  = wobbleA * Math.sin(wobbleCycles * angle + time * tSpeed + phase * Math.PI * 2);
+        const extra   = wobbleA * 0.3 * Math.sin((wobbleCycles + 2) * angle - time * (tSpeed * 0.7) + modul * Math.PI);
+        const r       = baseR + wobble + extra;
+        const x = cx + Math.cos(angle) * r;
+        const y = cy + Math.sin(angle) * r;
+        s === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = `hsla(${ringHue|0},${55 + modul*30}%,68%,${alpha})`;
+      ctx.lineWidth   = 0.4 + (1 - phase) * gain * 3.5;
+      ctx.stroke();
     }
     ctx.restore();
   }
 
+  // ── Figura Lissajous (trazo acumulativo + persistencia) ───
+  // Dibuja un segmento por frame; la persistencia del fade crea el trail.
+  function updateLissajous(cx, cy, freq, gain, modul, hue, time) {
+    const ax = Math.min(W, H) * 0.32 * gain;
+    const ay = Math.min(W, H) * 0.32 * gain;
+    const fx = freq * 3;
+    const fy = Math.round(freq * modul * 2 + 0.5) + 0.5; // ratio racionalizado
+    const phase = modul * Math.PI * 2;
+
+    const x = cx + Math.cos(fx * time) * ax;
+    const y = cy + Math.sin(fy * time + phase) * ay;
+
+    if (prevLX !== undefined) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      ctx.strokeStyle = `hsla(${(hue + 60) % 360},90%,80%,0.85)`;
+      ctx.lineWidth = 1.5;
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = `hsla(${(hue+60)%360},90%,70%,0.6)`;
+      ctx.beginPath();
+      ctx.moveTo(prevLX, prevLY);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Punto brillante en la posición actual
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    ctx.fillStyle = `hsla(${hue},100%,90%,0.9)`;
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = `hsla(${hue},100%,80%,0.7)`;
+    ctx.beginPath();
+    ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    prevLX = x; prevLY = y;
+  }
+
+  // ── Puntos de control ─────────────────────────────────────
+  function drawPoints(c) {
+    pts.forEach((p, i) => {
+      const px = p.x * W, py = p.y * H;
+      const pulse = 0.5 + 0.5 * Math.sin(t * 2.5 + i * 1.2);
+
+      ctx.save();
+      ctx.strokeStyle = `${c}${Math.round(pulse*0x28).toString(16).padStart(2,'0')}`;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 6]);
+      ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, H); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+
+      ctx.save();
+      ctx.strokeStyle = `${c}${Math.round(pulse*0x44).toString(16).padStart(2,'0')}`;
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(px, py, 18, 0, Math.PI*2); ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      ctx.fillStyle = c;
+      ctx.shadowBlur  = p.dragging ? 24 : 10;
+      ctx.shadowColor = c;
+      ctx.beginPath(); ctx.arc(px, py, p.dragging ? 8 : 5, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+    });
+  }
+
   // ── Readout ───────────────────────────────────────────────
-  function updateReadout() {
-    const { freq, gain, modul } = params();
+  function updateReadout(freq, gain, modul) {
     const fEl = document.getElementById('readout-freq');
     const gEl = document.getElementById('readout-gain');
     const mEl = document.getElementById('readout-modul');
@@ -163,36 +175,37 @@
   // ── Bucle de render ───────────────────────────────────────
   function draw() {
     if (canvas.style.display === 'none') { requestAnimationFrame(draw); return; }
-    if (!W || !H) resize();
+    if (!W || canvas.width !== canvas.offsetWidth || canvas.height !== canvas.offsetHeight) {
+      resize(); if (!W) { requestAnimationFrame(draw); return; }
+    }
+
     t += 0.016;
+    const { freq, gain, modul } = params();
+    const cx = W / 2, cy = H / 2;
 
+    // Hue sinestésico: frecuencia baja = cálido, alta = frío
+    const hue = ((1 - pts[0].x) * 60 + t * (freq * 3)) % 360;
+
+    // Fade persistente (crea el efecto de trail sin borrar)
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = 'rgba(6,6,6,0.042)';
+    ctx.fillRect(0, 0, W, H);
+
+    drawCore(cx, cy, freq, gain, hue, t);
+    drawRings(cx, cy, freq, gain, modul, hue, t);
+    updateLissajous(cx, cy, freq, gain, modul, hue, t);
+
+    // Puntos de control encima de todo
+    ctx.globalCompositeOperation = 'source-over';
     const c = neon();
-
-    drawBackground(c);
-
-    // Onda portadora (fondo, muy sutil)
-    drawWavePasses(carrierY, c, t, [
-      { width: 1, alpha: '11', blur: 4 },
-    ]);
-
-    // Onda principal — 3 pasadas (efecto fósforo)
-    drawWavePasses(waveY, c, t, [
-      { width: 14, alpha: '08', blur: 40 }, // halo exterior
-      { width: 5,  alpha: '22', blur: 18 }, // brillo medio
-      { width: 1.5,alpha: 'ff', blur: 6  }, // núcleo nítido
-    ]);
-
-    drawSpectrum(c, t);
     drawPoints(c);
-    updateReadout();
+    updateReadout(freq, gain, modul);
 
     requestAnimationFrame(draw);
   }
 
-  // ── Drag de puntos de control ─────────────────────────────
-  function ptAt(x, y) {
-    return pts.find(p => Math.hypot(p.x * W - x, p.y * H - y) < 20);
-  }
+  // ── Drag ──────────────────────────────────────────────────
+  function ptAt(x, y) { return pts.find(p => Math.hypot(p.x*W-x, p.y*H-y) < 20); }
 
   canvas.addEventListener('mousedown', e => {
     const p = ptAt(e.offsetX, e.offsetY);
@@ -203,6 +216,7 @@
     if (d) {
       d.x = Math.max(0.04, Math.min(0.96, e.offsetX / W));
       d.y = Math.max(0.04, Math.min(0.96, e.offsetY / H));
+      prevLX = undefined; // reset Lissajous al mover
     }
   });
   canvas.addEventListener('mouseup',    () => pts.forEach(p => p.dragging = false));
