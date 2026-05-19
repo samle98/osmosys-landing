@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Foro — Osmosys</title>
+  <meta name="viewport" content="width=1440">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/cursor.css">
+  <link rel="stylesheet" href="css/nav.css">
+  <link rel="stylesheet" href="css/community.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <link rel="stylesheet" href="css/foro.css">
+</head>
+<body>
+
+  <!-- CUSTOM CURSOR -->
+  <div class="cursor-ring" id="cursorRing"></div>
+  <div class="cursor-dot"  id="cursorDot"></div>
+
+  <!-- NAVBAR -->
+  <nav class="nav">
+    <a class="logo" href="index.html">
+      <img src="assets/logo-white.png" alt="Osmosys">
+      <span class="word">OSMOSYS</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html">Inicio</a>
+      <a href="#">Galería 360</a>
+      <a href="#">Laboratorio</a>
+      <a href="foro.html" class="active">Foro</a>
+      <button class="audio-btn" id="audioBtn" aria-label="Audio del sitio">
+        <span class="bars"><i></i><i></i><i></i><i></i></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="foro-main">
+
+    <!-- ── VISTA: lista de hilos ── -->
+    <div id="view-list">
+
+      <header class="foro-header">
+        <h1 class="foro-title">
+          <small>// cápsula 04 — foro y archivo vivo</small>
+          COMUNIDAD.
+        </h1>
+        <div id="authBar" class="auth-bar">
+          <span>…</span>
+        </div>
+      </header>
+
+      <div class="threads-actions">
+        <span id="threadsCount" class="threads-count"></span>
+        <button id="btnNuevo" class="btn">Nuevo hilo <span class="arrow">+</span></button>
+      </div>
+
+      <div id="threadsList" class="threads-list">
+        <div class="loading-line">cargando hilos…</div>
+      </div>
+
+    </div>
+
+    <!-- ── VISTA: detalle de hilo ── -->
+    <div id="view-thread" hidden>
+
+      <a href="#/" class="back-link">← Todos los hilos</a>
+
+      <div id="threadDetail"></div>
+
+      <section class="replies-section">
+        <div class="replies-header" id="repliesHeader">// respuestas</div>
+        <div id="repliesList"></div>
+
+        <!-- Formulario de respuesta (solo para usuarios autenticados) -->
+        <form id="replyForm" class="reply-form" hidden>
+          <div class="form-group">
+            <label class="form-label" for="replyBody">Tu respuesta</label>
+            <textarea
+              id="replyBody"
+              class="form-textarea"
+              rows="5"
+              placeholder="Escribe aquí…"
+            ></textarea>
+          </div>
+          <p id="replyMsg" class="form-error" hidden></p>
+          <button type="submit" class="btn btn--neon">
+            Responder <span class="arrow">→</span>
+          </button>
+        </form>
+
+        <!-- Prompt de login (para no autenticados) -->
+        <p id="replyLoginPrompt" class="reply-login-prompt" hidden>
+          <button id="replyLoginBtn">Inicia sesión</button> para responder este hilo.
+        </p>
+      </section>
+
+    </div>
+
+    <!-- ── VISTA: nuevo hilo ── -->
+    <div id="view-nuevo" hidden>
+
+      <a href="#/" class="back-link">← Todos los hilos</a>
+
+      <div class="nuevo-wrap">
+        <h2 class="nuevo-title">
+          <small>// crear nuevo hilo</small>
+          NUEVO HILO.
+        </h2>
+
+        <form id="nuevoForm">
+          <div class="form-group">
+            <label class="form-label" for="nuevoTitle">Título</label>
+            <input
+              id="nuevoTitle"
+              class="form-input"
+              type="text"
+              placeholder="¿De qué trata?"
+              maxlength="200"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="nuevoBadge">Categoría</label>
+            <select id="nuevoBadge" class="form-select">
+              <option value="hilo abierto">// hilo abierto</option>
+              <option value="galería abierta">// galería abierta</option>
+              <option value="convocatoria">// convocatoria</option>
+              <option value="archivo">// archivo</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="nuevoBody">Mensaje</label>
+            <textarea
+              id="nuevoBody"
+              class="form-textarea"
+              rows="8"
+              placeholder="Desarrolla tu idea…"
+            ></textarea>
+          </div>
+
+          <p id="nuevoMsg" class="form-error" hidden></p>
+          <button type="submit" class="btn btn--neon">
+            Publicar hilo <span class="arrow">→</span>
+          </button>
+        </form>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- MODAL DE AUTENTICACIÓN -->
+  <div class="auth-modal" id="authModal">
+    <div class="auth-box">
+      <button class="auth-close" id="authClose" aria-label="Cerrar">✕</button>
+
+      <h2 class="auth-box-title" id="authBoxTitle">Entrar.</h2>
+
+      <form id="authForm" autocomplete="on">
+
+        <!-- Solo visible en modo registro -->
+        <div class="form-group" id="usernameGroup" hidden>
+          <label class="form-label" for="authUsername">Nombre de usuario</label>
+          <input
+            id="authUsername"
+            class="form-input"
+            type="text"
+            placeholder="tu_nombre"
+            autocomplete="username"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="authEmail">Email</label>
+          <input
+            id="authEmail"
+            class="form-input"
+            type="email"
+            placeholder="tu@email.com"
+            autocomplete="email"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="authPassword">Contraseña</label>
+          <input
+            id="authPassword"
+            class="form-input"
+            type="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+          >
+        </div>
+
+        <p id="authMsg" class="form-error" hidden></p>
+
+        <button type="submit" class="btn btn--neon auth-submit">
+          <span id="authBtnLabel">Entrar</span> <span class="arrow">→</span>
+        </button>
+      </form>
+
+      <div class="auth-toggle">
+        <span id="authToggleText">¿No tienes cuenta?</span>
+        <button id="authToggleBtn">Regístrate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="foot">
+    <span>© OSMOSYS 2026</span>
+    <div class="right">
+      <a href="#">RSS</a>
+      <a href="#">Mastodon</a>
+      <a href="#">Newsletter</a>
+      <a href="#">Contacto</a>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script defer src="js/cursor.js"></script>
+  <script defer src="js/audio-toggle.js"></script>
+  <!-- Supabase UMD (sin defer para que window.supabase esté disponible antes que los defer) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script defer src="js/supabase-client.js"></script>
+  <script defer src="js/foro.js"></script>
+
+</body>
+</html>
