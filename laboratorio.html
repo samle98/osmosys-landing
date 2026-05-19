@@ -94,27 +94,46 @@
           <div class="lab-sliders">
             <div class="lab-slider-group">
               <label class="lab-slider-label" for="slider-cantidad">
-                cantidad <span id="slider-cantidad-val">80</span>
+                partículas <span id="slider-cantidad-val">200</span>
               </label>
               <input type="range" id="slider-cantidad"
-                class="lab-slider" min="10" max="300" step="5" value="80">
+                class="lab-slider" min="50" max="400" step="10" value="200">
             </div>
             <div class="lab-slider-group">
               <label class="lab-slider-label" for="slider-velocidad">
-                velocidad <span id="slider-velocidad-val">4</span>
+                velocidad <span id="slider-velocidad-val">3</span>
               </label>
               <input type="range" id="slider-velocidad"
-                class="lab-slider" min="1" max="20" step="0.5" value="4">
+                class="lab-slider" min="1" max="10" step="0.5" value="3">
             </div>
             <div class="lab-slider-group">
               <label class="lab-slider-label" for="slider-dispersion">
-                dispersión <span id="slider-dispersion-val">3</span>
+                turbulencia <span id="slider-dispersion-val">12</span>
               </label>
               <input type="range" id="slider-dispersion"
-                class="lab-slider" min="1" max="50" step="1" value="3">
+                class="lab-slider" min="2" max="40" step="1" value="12">
+            </div>
+            <div class="lab-slider-group">
+              <label class="lab-slider-label" for="slider-hue">
+                tono <span id="slider-hue-val">80</span>
+              </label>
+              <input type="range" id="slider-hue"
+                class="lab-slider" min="0" max="360" step="5" value="80">
             </div>
           </div>
-          <span class="lab-instructions">Mueve el mouse sobre el canvas para emitir partículas</span>
+          <div class="lab-toggles-col">
+            <div class="lab-toggle-group">
+              <button class="lab-toggle-btn" data-shape="circle">Círculo</button>
+              <button class="lab-toggle-btn active" data-shape="line">Línea</button>
+              <button class="lab-toggle-btn" data-shape="cross">Cruz</button>
+            </div>
+            <div class="lab-toggle-group">
+              <button class="lab-toggle-btn active" data-field-mode="flow">Flujo</button>
+              <button class="lab-toggle-btn" data-field-mode="radial">Radial</button>
+              <button class="lab-toggle-btn" data-field-mode="chaos">Caos</button>
+            </div>
+          </div>
+          <span class="lab-instructions">Mueve el mouse · el campo reacciona al cursor</span>
         </div>
 
         <!-- Tinta: instrucciones + botón limpiar -->

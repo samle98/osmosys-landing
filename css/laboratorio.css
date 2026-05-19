@@ -176,3 +176,39 @@
   box-shadow: 0 0 8px var(--neon);
   border-radius: 0;
 }
+
+/* ── Toggles de forma / modo (modo partícula) ────────────── */
+.lab-toggles-col {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+.lab-toggle-group {
+  display: flex;
+  border: 1px solid var(--line-2);
+  overflow: hidden;
+}
+
+.lab-toggle-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--line-2);
+  color: var(--ink-mute);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  padding: 7px 10px;
+  cursor: none;
+  transition: background .15s, color .15s;
+  white-space: nowrap;
+}
+.lab-toggle-btn:last-child { border-right: none }
+.lab-toggle-btn:hover      { color: var(--neon) }
+.lab-toggle-btn.active {
+  background: var(--neon-hover);
+  color: var(--neon);
+}
