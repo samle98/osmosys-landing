@@ -3,7 +3,7 @@
 // Debe cargarse antes que los motores de canvas.
 
 const LAB = {
-  active: 'sintetizador',
+  active: 'particula',
   canvases: {},
 
   register(mode, canvas) {

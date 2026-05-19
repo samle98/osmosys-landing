@@ -57,40 +57,25 @@
 
     <div class="lab-frame lab-frame-full">
 
-      <!-- Barra de modos -->
+      <!-- Barra de modos: Partícula → Sintetizador → Tinta -->
       <div class="lab-toolbar">
-        <span class="on" data-mode="sintetizador">// sintetizador</span>
-        <span data-mode="particula">partícula</span>
+        <span class="on" data-mode="particula">partícula</span>
+        <span data-mode="sintetizador">// sintetizador</span>
         <span data-mode="tinta">tinta</span>
       </div>
 
-      <!-- Canvases (uno por modo) -->
+      <!-- Canvases: partícula visible por defecto -->
       <div class="lab-canvas-wrap">
-        <canvas id="canvas-sintetizador" class="lab-canvas"></canvas>
-        <canvas id="canvas-particula"   class="lab-canvas" style="display:none"></canvas>
-        <canvas id="canvas-tinta"       class="lab-canvas" style="display:none"></canvas>
+        <canvas id="canvas-particula"    class="lab-canvas"></canvas>
+        <canvas id="canvas-sintetizador" class="lab-canvas" style="display:none"></canvas>
+        <canvas id="canvas-tinta"        class="lab-canvas" style="display:none"></canvas>
       </div>
 
-      <!-- HUD: un panel por modo -->
+      <!-- HUD: un panel por modo — partícula visible por defecto -->
       <div class="lab-hud-area">
 
-        <!-- Sintetizador: readout + instrucciones + knobs decorativos -->
-        <div id="hud-sintetizador" class="lab-hud-panel">
-          <div class="lab-readout">
-            freq &nbsp;<b id="readout-freq">220.5 hz</b><br>
-            gain &nbsp;<b id="readout-gain">-12 db</b><br>
-            modul <b id="readout-modul">0.34</b>
-          </div>
-          <span class="lab-instructions">Arrastra los tres puntos para modificar la onda</span>
-          <div class="lab-knobs">
-            <div class="knob k1"></div>
-            <div class="knob k2"></div>
-            <div class="knob k3"></div>
-          </div>
-        </div>
-
-        <!-- Partícula: sliders + instrucciones -->
-        <div id="hud-particula" class="lab-hud-panel" style="display:none">
+        <!-- Partícula: sliders + toggles -->
+        <div id="hud-particula" class="lab-hud-panel">
           <div class="lab-sliders">
             <div class="lab-slider-group">
               <label class="lab-slider-label" for="slider-cantidad">
@@ -131,6 +116,21 @@
             </div>
           </div>
           <span class="lab-instructions">Mueve el mouse · el campo reacciona al cursor</span>
+        </div>
+
+        <!-- Sintetizador: readout Chladni + instrucciones -->
+        <div id="hud-sintetizador" class="lab-hud-panel" style="display:none">
+          <div class="lab-readout">
+            m &nbsp;&nbsp;&nbsp;<b id="readout-freq">2</b><br>
+            energía <b id="readout-gain">0.78</b><br>
+            n &nbsp;&nbsp;&nbsp;<b id="readout-modul">5</b>
+          </div>
+          <span class="lab-instructions">Arrastra los puntos — m y n definen el patrón, energía lo fuerza</span>
+          <div class="lab-knobs">
+            <div class="knob k1"></div>
+            <div class="knob k2"></div>
+            <div class="knob k3"></div>
+          </div>
         </div>
 
         <!-- Tinta: instrucciones + botón limpiar -->

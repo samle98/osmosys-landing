@@ -1,21 +1,22 @@
-// lab-synth.js — Chromafield: visualización sinestésica.
-// Cada parámetro controla 3+ canales visuales simultáneamente.
-// Punto 0 → frecuencia (hue, velocidad, conteo de anillos)
-// Punto 1 → ganancia  (tamaño, brillo, amplitud de ondulación)
-// Punto 2 → modulación (complejidad, saturación, forma Lissajous)
+// lab-synth.js — modo sintetizador: Chladni / Cymatics.
+// Partículas migran hacia las líneas nodales de una función de onda
+// estacionaria bidimensional (patrón de Chladni sobre placa cuadrada).
+// pt[0].x → m  (1–8, entero): simetría del patrón
+// pt[1].y → energía (0–1):    fuerza de atracción y brillo
+// pt[2].x → n  (1–8, entero): complejidad / interacción de armónicos
 
 (() => {
   const canvas = document.getElementById('canvas-sintetizador');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
 
-  let W = 0, H = 0, t = 0;
-  let prevLX, prevLY; // posición anterior del trazo Lissajous
+  let W = 0, H = 0, frame = 0;
+  const N = 4000; // partículas
 
   const pts = [
-    { x: 0.20, y: 0.50, dragging: false },
-    { x: 0.50, y: 0.24, dragging: false },
-    { x: 0.78, y: 0.50, dragging: false },
+    { x: 0.28, y: 0.50, dragging: false },
+    { x: 0.50, y: 0.22, dragging: false },
+    { x: 0.72, y: 0.50, dragging: false },
   ];
 
   function resize() {
@@ -23,189 +24,190 @@
     if (!w || !h) return;
     W = w; H = h;
     canvas.width = W; canvas.height = H;
-    prevLX = undefined; prevLY = undefined;
+    initParticles();
     ctx.fillStyle = '#060606';
     ctx.fillRect(0, 0, W, H);
   }
 
   function neon() {
-    return getComputedStyle(document.documentElement).getPropertyValue('--neon').trim() || '#3693C8';
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue('--neon').trim() || '#3693C8';
   }
 
   function params() {
     return {
-      freq:  pts[0].x * 7.5 + 0.8,
-      gain:  Math.max(0.05, (0.5 - pts[1].y) * 2),
-      modul: pts[2].x,
+      m:    Math.max(1, Math.round(pts[0].x * 8.4)),
+      gain: Math.max(0.08, Math.min(1, 1 - pts[1].y)),
+      n:    Math.max(1, Math.round(pts[2].x * 8.4)),
     };
   }
 
-  // ── Núcleo central pulsante ───────────────────────────────
-  function drawCore(cx, cy, freq, gain, hue, time) {
-    const r = 18 + gain * 65 * (0.85 + 0.15 * Math.sin(time * 3.5));
-    ctx.save();
-    ctx.globalCompositeOperation = 'screen';
-    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-    g.addColorStop(0,   `hsla(${hue},80%,80%,${gain * 0.9})`);
-    g.addColorStop(0.4, `hsla(${hue},70%,55%,${gain * 0.45})`);
-    g.addColorStop(1,   `hsla(${hue},70%,40%,0)`);
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
+  // ── Función de Chladni: f(x,y) = cos(mπx)cos(nπy) + cos(nπx)cos(mπy) ──
+  // Coordenadas normalizadas al cuadrado centrado en el canvas.
+  function halfPlate() { return Math.min(W, H) * 0.44; }
+
+  function chladniFieldAndGrad(x, y, m, n) {
+    const S  = halfPlate();
+    const nx = (x - W/2) / S;
+    const ny = (y - H/2) / S;
+    const A  = Math.PI;
+    const cmx = Math.cos(m*A*nx), cnx = Math.cos(n*A*nx);
+    const cmy = Math.cos(m*A*ny), cny = Math.cos(n*A*ny);
+    const smx = Math.sin(m*A*nx), snx = Math.sin(n*A*nx);
+    const smy = Math.sin(m*A*ny), sny = Math.sin(n*A*ny);
+
+    const f = cmx*cny + cnx*cmy;
+
+    // grad(f) analítico → luego -f*grad(f) = -grad(f²/2) empuja al cero
+    const dfdnx = (-m*A*smx*cny) + (-n*A*snx*cmy);
+    const dfdny = (cmx*(-n*A*sny)) + (cnx*(-m*A*smy));
+    const sc = 1 / S;
+    return { f, fx: -f * dfdnx * sc, fy: -f * dfdny * sc };
   }
 
-  // ── Anillos cromáticos modulados ──────────────────────────
-  // El número de anillos varía con freq; la ondulación con gain y modul.
-  function drawRings(cx, cy, freq, gain, modul, hue, time) {
-    const numRings = Math.round(freq * 1.4 + 4);   // 5–16 anillos
-    const maxR     = Math.min(W, H) * 0.46;
-    const wobbleCycles = Math.round(freq * 2) * 2 + 2; // siempre par → simetría
-    const tSpeed   = 1 + freq * 0.4;               // freq → velocidad de animación
+  // ── Partículas ────────────────────────────────────────────
+  let particles = [];
 
-    ctx.save();
-    ctx.globalCompositeOperation = 'screen';
-
-    for (let i = 0; i < numRings; i++) {
-      const phase   = (i + 1) / numRings;
-      const baseR   = phase * maxR;
-      const ringHue = (hue + i * (25 + modul * 20)) % 360;
-      const alpha   = (1 - phase * 0.65) * (0.28 + gain * 0.55);
-      const wobbleA = gain * baseR * 0.28;
-
-      ctx.beginPath();
-      const steps = 90;
-      for (let s = 0; s <= steps; s++) {
-        const angle   = (s / steps) * Math.PI * 2;
-        const wobble  = wobbleA * Math.sin(wobbleCycles * angle + time * tSpeed + phase * Math.PI * 2);
-        const extra   = wobbleA * 0.3 * Math.sin((wobbleCycles + 2) * angle - time * (tSpeed * 0.7) + modul * Math.PI);
-        const r       = baseR + wobble + extra;
-        const x = cx + Math.cos(angle) * r;
-        const y = cy + Math.sin(angle) * r;
-        s === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-      ctx.strokeStyle = `hsla(${ringHue|0},${55 + modul*30}%,68%,${alpha})`;
-      ctx.lineWidth   = 0.4 + (1 - phase) * gain * 3.5;
-      ctx.stroke();
-    }
-    ctx.restore();
-  }
-
-  // ── Figura Lissajous (trazo acumulativo + persistencia) ───
-  // Dibuja un segmento por frame; la persistencia del fade crea el trail.
-  function updateLissajous(cx, cy, freq, gain, modul, hue, time) {
-    const ax = Math.min(W, H) * 0.32 * gain;
-    const ay = Math.min(W, H) * 0.32 * gain;
-    const fx = freq * 3;
-    const fy = Math.round(freq * modul * 2 + 0.5) + 0.5; // ratio racionalizado
-    const phase = modul * Math.PI * 2;
-
-    const x = cx + Math.cos(fx * time) * ax;
-    const y = cy + Math.sin(fy * time + phase) * ay;
-
-    if (prevLX !== undefined) {
-      ctx.save();
-      ctx.globalCompositeOperation = 'screen';
-      ctx.strokeStyle = `hsla(${(hue + 60) % 360},90%,80%,0.85)`;
-      ctx.lineWidth = 1.5;
-      ctx.shadowBlur = 6;
-      ctx.shadowColor = `hsla(${(hue+60)%360},90%,70%,0.6)`;
-      ctx.beginPath();
-      ctx.moveTo(prevLX, prevLY);
-      ctx.lineTo(x, y);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    // Punto brillante en la posición actual
-    ctx.save();
-    ctx.globalCompositeOperation = 'screen';
-    ctx.fillStyle = `hsla(${hue},100%,90%,0.9)`;
-    ctx.shadowBlur = 12;
-    ctx.shadowColor = `hsla(${hue},100%,80%,0.7)`;
-    ctx.beginPath();
-    ctx.arc(x, y, 2.5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-
-    prevLX = x; prevLY = y;
-  }
-
-  // ── Puntos de control ─────────────────────────────────────
-  function drawPoints(c) {
-    pts.forEach((p, i) => {
-      const px = p.x * W, py = p.y * H;
-      const pulse = 0.5 + 0.5 * Math.sin(t * 2.5 + i * 1.2);
-
-      ctx.save();
-      ctx.strokeStyle = `${c}${Math.round(pulse*0x28).toString(16).padStart(2,'0')}`;
-      ctx.lineWidth = 1;
-      ctx.setLineDash([3, 6]);
-      ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, H); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.restore();
-
-      ctx.save();
-      ctx.strokeStyle = `${c}${Math.round(pulse*0x44).toString(16).padStart(2,'0')}`;
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.arc(px, py, 18, 0, Math.PI*2); ctx.stroke();
-      ctx.restore();
-
-      ctx.save();
-      ctx.fillStyle = c;
-      ctx.shadowBlur  = p.dragging ? 24 : 10;
-      ctx.shadowColor = c;
-      ctx.beginPath(); ctx.arc(px, py, p.dragging ? 8 : 5, 0, Math.PI*2); ctx.fill();
-      ctx.restore();
+  function initParticles() {
+    const cx = W/2, cy = H/2, S = halfPlate();
+    particles = Array.from({ length: N }, () => {
+      const a = Math.random() * Math.PI * 2;
+      const r = Math.random() * S * 0.95;
+      const x = cx + Math.cos(a) * r;
+      const y = cy + Math.sin(a) * r;
+      return { x, y, px: x, py: y, vx: 0, vy: 0, f: 0 };
     });
   }
 
-  // ── Readout ───────────────────────────────────────────────
-  function updateReadout(freq, gain, modul) {
-    const fEl = document.getElementById('readout-freq');
-    const gEl = document.getElementById('readout-gain');
-    const mEl = document.getElementById('readout-modul');
-    if (fEl) fEl.textContent = (freq * 110).toFixed(1) + ' hz';
-    if (gEl) gEl.textContent = (gain * 12).toFixed(1)  + ' db';
-    if (mEl) mEl.textContent = modul.toFixed(2);
-  }
+  // ── Render ────────────────────────────────────────────────
+  const LEVELS = 12;
+  const groups = Array.from({ length: LEVELS }, () => []);
 
-  // ── Bucle de render ───────────────────────────────────────
   function draw() {
     if (canvas.style.display === 'none') { requestAnimationFrame(draw); return; }
     if (!W || canvas.width !== canvas.offsetWidth || canvas.height !== canvas.offsetHeight) {
       resize(); if (!W) { requestAnimationFrame(draw); return; }
     }
+    frame++;
 
-    t += 0.016;
-    const { freq, gain, modul } = params();
-    const cx = W / 2, cy = H / 2;
+    const { m, n, gain } = params();
+    const S        = halfPlate();
+    const strength = 0.15 + gain * 0.6;
+    const damping  = 0.80 + gain * 0.14; // alto gain → más amortiguación → más precisión
+    const jitter   = (1 - gain) * 0.5 + 0.06;
 
-    // Hue sinestésico: frecuencia baja = cálido, alta = frío
-    const hue = ((1 - pts[0].x) * 60 + t * (freq * 3)) % 360;
+    // ── Paso 1: actualizar partículas ──────────────────────
+    for (let i = 0; i < LEVELS; i++) groups[i].length = 0;
 
-    // Fade persistente (crea el efecto de trail sin borrar)
+    for (const p of particles) {
+      p.px = p.x; p.py = p.y;
+      const { f, fx, fy } = chladniFieldAndGrad(p.x, p.y, m, n);
+      p.f = f;
+
+      p.vx = (p.vx + fx * strength + (Math.random() - 0.5) * jitter) * damping;
+      p.vy = (p.vy + fy * strength + (Math.random() - 0.5) * jitter) * damping;
+
+      p.x += p.vx; p.y += p.vy;
+
+      // Rebote suave en el borde de la placa
+      const ex = Math.abs(p.x - W/2) - S;
+      const ey = Math.abs(p.y - H/2) - S;
+      if (ex > 0) { p.x = W/2 + Math.sign(p.x - W/2) * (S - ex * 0.4); p.vx *= -0.45; }
+      if (ey > 0) { p.y = H/2 + Math.sign(p.y - H/2) * (S - ey * 0.4); p.vy *= -0.45; }
+
+      // Agrupar por cercanía al nodo para dibujo eficiente
+      const nearNode = 1 - Math.min(1, Math.abs(f) * 1.9);
+      const lvl = Math.min(LEVELS - 1, nearNode * LEVELS | 0);
+      groups[lvl].push(p);
+    }
+
+    // ── Paso 2: fade persistente ───────────────────────────
     ctx.globalCompositeOperation = 'source-over';
-    ctx.fillStyle = 'rgba(6,6,6,0.042)';
+    ctx.fillStyle = `rgba(6,6,6,${0.055 + gain * 0.025})`;
     ctx.fillRect(0, 0, W, H);
 
-    drawCore(cx, cy, freq, gain, hue, t);
-    drawRings(cx, cy, freq, gain, modul, hue, t);
-    updateLissajous(cx, cy, freq, gain, modul, hue, t);
-
-    // Puntos de control encima de todo
-    ctx.globalCompositeOperation = 'source-over';
+    // ── Paso 3: dibujar por grupos (batched) ───────────────
     const c = neon();
-    drawPoints(c);
-    updateReadout(freq, gain, modul);
+    ctx.globalCompositeOperation = 'screen';
+
+    for (let lvl = 0; lvl < LEVELS; lvl++) {
+      const nearNode = lvl / (LEVELS - 1);
+      const a  = (0.06 + nearNode * 0.72) * (0.4 + gain * 0.6);
+      const lw = 0.4 + nearNode * 1.4;
+      ctx.strokeStyle = `${c}${Math.round(a * 255).toString(16).padStart(2, '0')}`;
+      ctx.lineWidth   = lw;
+      ctx.beginPath();
+      for (const p of groups[lvl]) {
+        ctx.moveTo(p.px, p.py);
+        ctx.lineTo(p.x,  p.y);
+      }
+      ctx.stroke();
+    }
+
+    // ── Paso 4: puntos de control ──────────────────────────
+    ctx.globalCompositeOperation = 'source-over';
+    drawPoints(neon(), m, n, gain);
+    updateReadout(m, n, gain);
 
     requestAnimationFrame(draw);
   }
 
+  // ── Puntos de control ─────────────────────────────────────
+  function drawPoints(c, m, n, gain) {
+    const labels = [`m:${m}`, `e:${gain.toFixed(2)}`, `n:${n}`];
+    pts.forEach((p, i) => {
+      const px = p.x * W, py = p.y * H;
+      const pulse = 0.55 + 0.45 * Math.sin(frame * 0.04 + i * 1.3);
+
+      // Guía punteada
+      const isHoriz = (i === 0 || i === 2);
+      ctx.save();
+      ctx.strokeStyle = c + '1a';
+      ctx.lineWidth   = 1;
+      ctx.setLineDash([3, 7]);
+      ctx.beginPath();
+      if (isHoriz) { ctx.moveTo(px, 0); ctx.lineTo(px, H); }
+      else          { ctx.moveTo(0, py); ctx.lineTo(W, py); }
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+
+      // Anillo exterior pulsante
+      ctx.save();
+      ctx.strokeStyle = c + Math.round(pulse * 0x30).toString(16).padStart(2,'0');
+      ctx.lineWidth   = 1;
+      ctx.beginPath(); ctx.arc(px, py, 18, 0, Math.PI*2); ctx.stroke();
+      ctx.restore();
+
+      // Punto central
+      ctx.save();
+      ctx.fillStyle   = c;
+      ctx.shadowBlur  = p.dragging ? 20 : 8;
+      ctx.shadowColor = c;
+      ctx.beginPath(); ctx.arc(px, py, p.dragging ? 8 : 5, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+
+      // Etiqueta
+      ctx.save();
+      ctx.font      = `400 10px var(--font-mono, monospace)`;
+      ctx.fillStyle = c;
+      ctx.globalAlpha = 0.75;
+      ctx.fillText(labels[i], px + 12, py - 8);
+      ctx.restore();
+    });
+  }
+
+  function updateReadout(m, n, gain) {
+    const fEl = document.getElementById('readout-freq');
+    const gEl = document.getElementById('readout-gain');
+    const mEl = document.getElementById('readout-modul');
+    if (fEl) fEl.textContent = `${m}`;
+    if (gEl) gEl.textContent = `${gain.toFixed(2)}`;
+    if (mEl) mEl.textContent = `${n}`;
+  }
+
   // ── Drag ──────────────────────────────────────────────────
-  function ptAt(x, y) { return pts.find(p => Math.hypot(p.x*W-x, p.y*H-y) < 20); }
+  function ptAt(x, y) { return pts.find(p => Math.hypot(p.x*W-x, p.y*H-y) < 22); }
 
   canvas.addEventListener('mousedown', e => {
     const p = ptAt(e.offsetX, e.offsetY);
@@ -214,9 +216,8 @@
   canvas.addEventListener('mousemove', e => {
     const d = pts.find(p => p.dragging);
     if (d) {
-      d.x = Math.max(0.04, Math.min(0.96, e.offsetX / W));
-      d.y = Math.max(0.04, Math.min(0.96, e.offsetY / H));
-      prevLX = undefined; // reset Lissajous al mover
+      d.x = Math.max(0.03, Math.min(0.97, e.offsetX / W));
+      d.y = Math.max(0.03, Math.min(0.97, e.offsetY / H));
     }
   });
   canvas.addEventListener('mouseup',    () => pts.forEach(p => p.dragging = false));
