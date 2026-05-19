@@ -1,0 +1,19 @@
+/* ============================================================
+   scan.css — overlay de transición entre cápsulas
+   ============================================================ */
+
+.scan-fx{
+  position:fixed;inset:0;z-index:7000;pointer-events:none;opacity:0;
+}
+.scan-fx.on{
+  opacity:1;
+  background:
+    repeating-linear-gradient(0deg, rgba(232,228,220,.08) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, transparent 40%, rgba(232,228,220,.4) 50%, transparent 60%);
+  animation:scan 200ms ease-out;
+}
+@keyframes scan{
+  0%{background-position:0 -100vh, 0 -100vh;opacity:0}
+  20%{opacity:1}
+  100%{background-position:0 0, 0 100vh;opacity:0}
+}

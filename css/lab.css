@@ -1,0 +1,65 @@
+/* ============================================================
+   lab.css — Cápsula 03: laboratorio interactivo
+   ============================================================ */
+
+.cap-03-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:stretch}
+
+.lab-frame{
+  position:relative;border:1px solid var(--line-2);background:#050505;
+  min-height:440px;overflow:hidden;
+}
+
+.lab-toolbar{display:flex;gap:0;border-bottom:1px solid var(--line);background:var(--bg-2)}
+.lab-toolbar span{
+  padding:12px 16px;
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink-dim);border-right:1px solid var(--line);
+}
+.lab-toolbar span.on{background:var(--bg-3);color:var(--neon)}
+
+.lab-stage{position:relative;padding:32px;height:calc(100% - 44px)}
+.lab-stage .blob{
+  position:absolute;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%, var(--neon), var(--neon-deep) 60%, transparent 70%);
+  filter:blur(20px);opacity:.4;
+}
+.lab-stage .blob.a{width:200px;height:200px;top:20%;left:20%}
+.lab-stage .blob.b{width:140px;height:140px;bottom:20%;right:25%;opacity:.3}
+.lab-stage .wire{position:absolute;inset:32px;border:1px dashed var(--line-2)}
+.lab-stage .point{
+  position:absolute;width:8px;height:8px;background:var(--neon);border-radius:50%;
+  box-shadow:0 0 10px var(--neon);
+}
+.lab-stage .point.p1{top:30%;left:25%}
+.lab-stage .point.p2{top:55%;left:60%}
+.lab-stage .point.p3{top:35%;right:18%}
+.lab-stage svg.lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+
+.lab-readout{
+  position:absolute;bottom:14px;left:14px;
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.18em;color:var(--ink-dim);
+  line-height:1.7;
+}
+.lab-readout b{color:var(--neon);font-weight:400}
+
+.lab-knobs{position:absolute;bottom:14px;right:14px;display:flex;gap:10px}
+.knob{
+  width:30px;height:30px;border:1px solid var(--line-2);border-radius:50%;position:relative;
+}
+.knob::after{
+  content:"";position:absolute;left:50%;top:4px;width:1px;height:8px;background:var(--ink);
+  transform-origin:bottom;
+}
+.knob.k2::after{transform:translateX(-50%) rotate(45deg);background:var(--neon)}
+.knob.k3::after{transform:translateX(-50%) rotate(-30deg)}
+
+.lab-info{display:flex;flex-direction:column;justify-content:space-between;gap:24px}
+.lab-info h3{font-family:var(--font-display);font-size:64px;line-height:.92}
+.lab-info p{font-size:16px;line-height:1.5;color:var(--ink-dim);max-width:440px}
+.lab-info .keys{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px}
+.lab-info .key{padding:14px;border:1px solid var(--line);background:var(--bg-2)}
+.lab-info .key .num{font-family:var(--font-display);font-size:32px;color:var(--neon);line-height:1}
+.lab-info .key .lab{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.22em;color:var(--ink-dim);
+  text-transform:uppercase;margin-top:6px;
+}

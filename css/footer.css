@@ -1,0 +1,14 @@
+/* ============================================================
+   footer.css — pie de página
+   ============================================================ */
+
+.foot{
+  border-top:1px solid var(--line);
+  padding:22px 36px;
+  display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.22em;
+  color:var(--ink-mute);text-transform:uppercase;
+}
+.foot .right{display:flex;gap:24px}
+.foot a{color:inherit;text-decoration:none}
+.foot a:hover{color:var(--neon)}

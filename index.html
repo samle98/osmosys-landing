@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Osmosys — Landing</title>
+  <meta name="viewport" content="width=1440">
+
+  <!-- Tipografías (CDN) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Hojas de estilo: base primero, resto en el orden del DOM -->
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/boot.css">
+  <link rel="stylesheet" href="css/scan.css">
+  <link rel="stylesheet" href="css/cursor.css">
+  <link rel="stylesheet" href="css/nav.css">
+  <link rel="stylesheet" href="css/hero.css">
+  <link rel="stylesheet" href="css/nodes.css">
+  <link rel="stylesheet" href="css/capsules.css">
+  <link rel="stylesheet" href="css/manifesto.css">
+  <link rel="stylesheet" href="css/gallery-360.css">
+  <link rel="stylesheet" href="css/lab.css">
+  <link rel="stylesheet" href="css/community.css">
+  <link rel="stylesheet" href="css/invite.css">
+  <link rel="stylesheet" href="css/tweaks.css">
+  <link rel="stylesheet" href="css/footer.css">
+</head>
+<body data-screen-label="01 Landing">
+
+  <!-- BOOT OVERLAY -->
+  <div class="boot" id="boot">
+    <div class="boot-inner">
+      <div class="boot-logo">
+        <img src="assets/logo-white.png" alt="">
+        <span class="word">OSMOSYS</span>
+      </div>
+      <div class="boot-lines">
+        <div>▸ osmosys.deck <b>v0.1</b> · boot sequence</div>
+        <div>▸ loading capsule pipeline………… <b>ok</b></div>
+        <div>▸ audio bus calibration………………… <b>ok</b></div>
+        <div>▸ inserting tape: <b>cap_01.manifiesto</b></div>
+        <div>▸ press anywhere or wait… ░</div>
+      </div>
+      <div class="boot-bar"></div>
+    </div>
+  </div>
+
+  <!-- SCAN TRANSITION OVERLAY -->
+  <div class="scan-fx" id="scanFx"></div>
+
+  <!-- CUSTOM CURSOR -->
+  <div class="cursor-ring" id="cursorRing"></div>
+  <div class="cursor-dot" id="cursorDot"></div>
+
+  <!-- NAVBAR -->
+  <nav class="nav">
+    <a class="logo" href="#">
+      <img src="assets/logo-white.png" alt="Osmosys">
+      <span class="word">OSMOSYS</span>
+    </a>
+    <div class="nav-links">
+      <a href="#" class="active">Inicio</a>
+      <a href="#" data-comment-anchor="5dd4c3e5a3-a">Galería 360</a>
+      <a href="#">Laboratorio</a>
+      <a href="#">Foro</a>
+      <button class="audio-btn" id="audioBtn" aria-label="Audio del sitio" data-comment-anchor="70389dc826-button">
+        <span class="bars"><i></i><i></i><i></i><i></i></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" data-screen-label="Hero">
+    <div class="hero-bg"></div>
+    <div class="hero-video"></div>
+    <div class="particles" id="particles"></div>
+
+    <div class="tape-strip top"></div>
+    <div class="tape-strip bot" style="background-position: center center; height: 16px; padding: 0px; margin: -75px; border-width: 0px; border-style: solid; border-radius: 0px"></div>
+
+    <div class="hero-content">
+      <div class="hero-kicker">
+        <span class="rec-dot"></span>
+        <span class="label">CAP · <span data-cap-num>01</span> / 05 · en vivo</span>
+        <span class="divider"></span>
+        <span class="label-sm" data-cap-kicker>MANIFIESTO</span>
+      </div>
+      <h1 class="hero-title">
+        Fusión <span class="accent" data-cap-title>arte</span><br>
+        <span class="line2">× código.</span>
+      </h1>
+      <p class="hero-body" data-cap-lead>
+        Osmosys es un colectivo donde el <strong>arte</strong> y la <strong>tecnología</strong> se filtran entre sí. Cinco cápsulas para entrar a nuestro proceso — manifiesto, obras, laboratorio, comunidad, invitación.
+      </p>
+      <div class="hero-cta">
+        <button class="btn btn--neon"><span class="play-icon"></span> Reproducir cápsula</button>
+      </div>
+    </div>
+
+    <div class="hero-preview">
+      <div class="preview-frame">
+        <div class="preview-corners"></div>
+        <span class="preview-tl mono">PREVIEW · <span data-cap-num>01</span></span>
+        <div class="preview-play"><span class="play-icon"></span></div>
+        <span class="preview-br mono">04:12</span>
+      </div>
+      <div class="preview-meta">
+      </div>
+    </div>
+  </section>
+
+  <!-- CAPSULE NODES -->
+  <div class="nodes-wrap" data-screen-label="Nodes">
+    <div class="nodes" role="tablist">
+      <button class="node" data-cap="01" data-active="true" role="tab">
+        <span class="n">01</span>
+        <span class="t">Manifiesto</span>
+        <span class="desc">Lo que somos en palabras propias.</span>
+      </button>
+      <button class="node" data-cap="02" role="tab">
+        <span class="n">02</span>
+        <span class="t">Creaciones</span>
+        <span class="desc">Galería 360° de obras del colectivo.</span>
+      </button>
+      <button class="node" data-cap="03" role="tab">
+        <span class="n">03</span>
+        <span class="t">Proceso</span>
+        <span class="desc">Laboratorio interactivo abierto.</span>
+      </button>
+      <button class="node" data-cap="04" role="tab">
+        <span class="n">04</span>
+        <span class="t">Comunidad</span>
+        <span class="desc">Foro de conversaciones y errores.</span>
+      </button>
+      <button class="node" data-cap="05" role="tab">
+        <span class="n">05</span>
+        <span class="t">Invitación</span>
+        <span class="desc">Sube tu propia cápsula al archivo.</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- CAPSULE BODIES -->
+  <div class="cap-stage" id="capStage">
+
+    <!-- CAP 01: MANIFIESTO -->
+    <section class="cap-body" data-cap-body="01" data-active data-screen-label="Cap 01 Manifiesto">
+      <div class="cap-head">
+        <h2 class="ttl"><small>// cápsula 01 — texto fundacional</small>MANIFIESTO.</h2>
+        <div class="meta">
+          04:12  ·  abril 2026<br>
+          <b>● en línea</b><br>
+          firmado por 11 voces
+        </div>
+      </div>
+      <div class="cap-01-grid">
+        <div class="manifesto">
+          <p>Creemos en la <span class="h">ósmosis</span> — en lo que pasa cuando dos membranas distintas comparten presión.</p>
+          <p>El arte filtra al código, el código filtra al arte. Ninguno sale igual. No nos interesa la pureza; nos interesa la mezcla que ocurre cuando nadie está mirando.</p>
+          <p>Trabajamos lento, fallamos en público, archivamos los errores. Cada obra es una hipótesis que dejamos respirar.</p>
+          <p class="sig">— Colectivo Osmosys </p>
+        </div>
+        <aside class="manifesto-aside">
+          <div class="doc-card">
+            <div class="corner-mark"></div>
+            <h4>// archivo descargable</h4>
+            <div class="filename">manifiesto_v07.pdf</div>
+            <div class="filesize">240 KB · español + inglés</div>
+            <button class="btn">Descargar <span class="arrow">↓</span></button>
+          </div>
+
+        </aside>
+      </div>
+    </section>
+
+    <!-- CAP 02: CREACIONES (GALERÍA 360°) -->
+    <section class="cap-body" data-cap-body="02" data-screen-label="Cap 02 Creaciones">
+      <div class="cap-head">
+        <h2 class="ttl"><small>// cápsula 02 — galería 360°</small>CREACIONES.</h2>
+        <div class="meta">
+          12 piezas  ·  2024 – 2026<br>
+          <b>● espacio activo</b><br>
+          entrada inmersiva
+        </div>
+      </div>
+
+      <div class="gallery-360">
+        <div class="pano-stage" id="pano">
+          <div class="pano-orbit"></div>
+          <div class="pano-image" id="panoImage">
+            <span class="crop tl"></span><span class="crop tr"></span>
+            <span class="crop bl"></span><span class="crop br"></span>
+            <div class="ph-label">
+              <span>// imagen panorámica · 360°</span>
+              <span class="play-ring"><span class="play-icon"></span></span>
+              <span class="dim">placeholder · 4096 × 1024</span>
+            </div>
+          </div>
+          <div class="pano-hud">
+            <div class="top">
+              <span class="pano-tag live">GALERÍA · ESPACIO 360°</span>
+              <span class="crosshair-c"></span>
+            </div>
+            <div class="bot">
+              <span class="drag-hint"><span class="arrows">⟵ ⟶</span> arrastra para mirar</span>
+              <span class="pano-tag">07 / 12</span>
+            </div>
+          </div>
+        </div>
+        <div class="pano-compass">
+          <span>N</span>
+          <div class="scale">
+            <i></i><i class="tall"></i><i></i><i></i><i class="tall"></i><i></i><i></i><i class="on tall"></i><i class="on"></i><i></i><i class="tall"></i><i></i><i></i><i class="tall"></i><i></i><i></i><i class="tall"></i><i></i><i></i><i class="tall"></i>
+          </div>
+          <span>S · pos. 7</span>
+        </div>
+      </div>
+
+      <div class="cap-02-meta">
+        <div class="left">
+          <h3>Entra al espacio.<br>No es una galería plana.</h3>
+          <p>Las 12 piezas habitan una sala panorámica que reacciona a tu mirada. Cada obra vive en su propio nicho — entras, escuchas, vuelves.</p>
+          <div style="margin-top:24px;display:flex;gap:14px">
+            <button class="btn btn--neon">Explorar galería <span class="arrow">→</span></button>
+            <button class="btn">Ver índice</button>
+          </div>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="num">12</div><div class="lab">piezas</div></div>
+          <div class="stat"><div class="num">360°</div><div class="lab">espacio</div></div>
+          <div class="stat"><div class="num">24m</div><div class="lab">audio total</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CAP 03: PROCESO -->
+    <section class="cap-body" data-cap-body="03" data-screen-label="Cap 03 Proceso">
+      <div class="cap-head">
+        <h2 class="ttl"><small>// cápsula 03 — laboratorio interactivo</small>PROCESO.</h2>
+        <div class="meta">
+          3 instrumentos abiertos<br>
+          <b>● beta pública</b><br>
+          sandbox en navegador
+        </div>
+      </div>
+      <div class="cap-03-grid">
+        <div class="lab-frame">
+          <div class="lab-toolbar">
+            <span class="on">// sintetizador</span>
+            <span>partícula</span>
+            <span>tinta</span>
+          </div>
+          <div class="lab-stage">
+            <div class="blob a"></div>
+            <div class="blob b"></div>
+            <div class="wire"></div>
+            <svg class="lines" viewBox="0 0 400 360" preserveAspectRatio="none">
+              <path d="M100 110 Q 200 50 240 200 T 340 130" stroke="#3693C8" stroke-opacity=".5" stroke-width="1" fill="none" stroke-dasharray="4 4"/>
+              <path d="M100 110 L 240 200 L 340 130" stroke="rgba(232,228,220,.18)" stroke-width="1" fill="none"/>
+            </svg>
+            <span class="point p1"></span>
+            <span class="point p2"></span>
+            <span class="point p3"></span>
+            <div class="lab-readout">
+              freq <b>220.5 hz</b><br>
+              gain <b>-12 db</b><br>
+              modul <b>0.34</b>
+            </div>
+            <div class="lab-knobs">
+              <div class="knob k1"></div>
+              <div class="knob k2"></div>
+              <div class="knob k3"></div>
+            </div>
+          </div>
+        </div>
+        <div class="lab-info">
+          <div>
+            <h3>Laboratorio<br>interactivo.</h3>
+            <p style="margin-top:18px">Tres instrumentos que abrimos para que cualquiera juegue. Mueve, escucha, exporta. Lo que hagas queda guardado en el archivo del colectivo.</p>
+          </div>
+          <div class="keys">
+            <div class="key"><div class="num">03</div><div class="lab">instrumentos</div></div>
+            <div class="key"><div class="num">∞</div><div class="lab">sesiones</div></div>
+            <div class="key"><div class="num">WebGL</div><div class="lab">render</div></div>
+            <div class="key"><div class="num">CC</div><div class="lab">licencia</div></div>
+          </div>
+          <button class="btn btn--neon">Experimentar ahora <span class="arrow">→</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CAP 04: COMUNIDAD -->
+    <section class="cap-body" data-cap-body="04" data-screen-label="Cap 04 Comunidad">
+      <div class="cap-head">
+        <h2 class="ttl"><small>// cápsula 04 — foro y archivo vivo</small>COMUNIDAD.</h2>
+        <div class="meta">
+          142 voces  ·  38 hilos activos<br>
+          <b>● foro abierto</b><br>
+          registro libre
+        </div>
+      </div>
+      <div class="threads">
+        <article class="thread">
+          <div class="top"><span class="badge">// hilo abierto</span><span class="time">hace 2d</span></div>
+          <h3>¿Qué es low-tech para ustedes? Definiciones imposibles.</h3>
+          <div class="meta"><span class="user">@rua</span><span class="replies">24 respuestas</span></div>
+        </article>
+        <article class="thread">
+          <div class="top"><span class="badge">// galería abierta</span><span class="time">hace 5d</span></div>
+          <h3>Arduinos resucitados — fotos de la sesión de marzo.</h3>
+          <div class="meta"><span class="user">@nube</span><span class="replies">8 respuestas</span></div>
+        </article>
+        <article class="thread">
+          <div class="top"><span class="badge">// convocatoria</span><span class="time">hace 1d</span></div>
+          <h3>Convocatoria abril — buscamos cuatro voces nuevas.</h3>
+          <div class="meta"><span class="user">@osmosys</span><span class="replies">3 respuestas</span></div>
+        </article>
+        <article class="thread">
+          <div class="top"><span class="badge">// archivo</span><span class="time">hace 6h</span></div>
+          <h3>Errores hermosos del pixel: una colección de glitches.</h3>
+          <div class="meta"><span class="user">@kolb</span><span class="replies">17 respuestas</span></div>
+        </article>
+      </div>
+      <div class="comm-stats">
+        <div class="list">
+          <div class="stat"><div class="num">142</div><div class="lab">miembros</div></div>
+          <div class="stat"><div class="num">38</div><div class="lab">hilos activos</div></div>
+          <div class="stat"><div class="num">1.2k</div><div class="lab">aportes</div></div>
+        </div>
+        <button class="btn btn--neon">Entrar al foro <span class="arrow">→</span></button>
+      </div>
+    </section>
+
+    <!-- CAP 05: INVITACIÓN -->
+    <section class="cap-body" data-cap-body="05" data-screen-label="Cap 05 Invitacion">
+      <div class="cap-head">
+        <h2 class="ttl"><small>// cápsula 05 — archivo abierto</small>INVITACIÓN.</h2>
+        <div class="meta">
+          envíos en curso  ·  sin curaduría<br>
+          <b>● recepción abierta</b><br>
+          máx 200 mb por pieza
+        </div>
+      </div>
+      <div class="invite">
+        <div class="invite-kicker"><span class="label">// archivo colectivo</span></div>
+        <h2>Sube tu propia<br><em>creación</em>.</h2>
+        <p>Proceso, error, boceto, idea perdida. Lo que tengas. Todo entra al archivo común del colectivo — sin curaduría, sin filtros.</p>
+        <div class="dropzone">
+          <div class="icon">↓</div>
+          <div class="ttl">Arrastra archivo aquí</div>
+          <div class="sub">o haz clic para seleccionar</div>
+        </div>
+        <div class="invite-formats">
+          <span>video / mp4 mov</span>
+          <span>audio / wav mp3</span>
+          <span>texto / md txt</span>
+          <span>imagen / png jpg</span>
+          <span>código / cualquiera</span>
+        </div>
+        <div class="invite-cta">
+          <button class="btn btn--neon">Empezar envío <span class="arrow">→</span></button>
+          <button class="btn">Ver políticas</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- TWEAKS PANEL -->
+  <div class="tweaks" id="tweaks" role="dialog" aria-label="Tweaks">
+    <div class="tweaks-head">
+      <span class="ttl">Tweaks</span>
+      <button class="tweaks-close" id="tweaksClose" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="tweaks-row">
+      <span class="label">Acento <span class="hex" id="hexLabel">#3693C8</span></span>
+      <div class="swatch-wrap">
+        <div class="swatch" id="swatch">
+          <input type="color" id="colorInput" value="#3693C8">
+        </div>
+        <div class="swatch-presets" id="presets">
+          <button data-color="#3693C8" style="background:#3693C8" title="Azul"></button>
+          <button data-color="#A3E635" style="background:#A3E635" title="Verde neón"></button>
+          <button data-color="#F472B6" style="background:#F472B6" title="Rosa"></button>
+          <button data-color="#F59E0B" style="background:#F59E0B" title="Ámbar"></button>
+          <button data-color="#E8E4DC" style="background:#E8E4DC" title="Hueso"></button>
+        </div>
+      </div>
+    </div>
+    <div class="tweaks-row" style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
+      <span class="label">Barras de audio</span>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="barBtn0" class="btn" style="flex:1;padding:10px 8px;font-size:10px;letter-spacing:.18em">Acento</button>
+        <button id="barBtn1" class="btn" style="flex:1;padding:10px 8px;font-size:10px;letter-spacing:.18em">Azul #3693C8</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="foot">
+    <span>© OSMOSYS 2026 </span>
+    <div class="right">
+      <a href="#">RSS</a>
+      <a href="#" data-comment-anchor="429ca7e30b-a">Mastodon</a>
+      <a href="#">Newsletter</a>
+      <a href="#">Contacto</a>
+    </div>
+  </footer>
+
+  <!-- Scripts: orden por dependencia / DOM. defer para no bloquear el parser. -->
+  <script defer src="js/cursor.js"></script>
+  <script defer src="js/boot.js"></script>
+  <script defer src="js/particles.js"></script>
+  <script defer src="js/capsule-switch.js"></script>
+  <script defer src="js/audio-toggle.js"></script>
+  <script defer src="js/gallery-360.js"></script>
+  <script defer src="js/tweaks.js"></script>
+
+</body>
+</html>

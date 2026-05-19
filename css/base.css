@@ -1,0 +1,79 @@
+/* ============================================================
+   base.css — reset, design tokens, tipografía global, botones
+   ============================================================ */
+
+:root{
+  /* COLOR */
+  --bg:#0a0a0a;
+  --bg-2:#111111;
+  --bg-3:#181818;
+  --ink:#e8e4dc;
+  --ink-dim:#9a958a;
+  --ink-mute:#5a564e;
+  --line:#262421;
+  --line-2:#34322e;
+  --neon: #3693C8;
+  --neon-deep: #1F6896;
+  --neon-soft: rgba(54,147,200,.18);
+  --neon-glow: rgba(54,147,200,.30);
+  --neon-hover: rgba(54,147,200,.10);
+  --rec: oklch(0.70 0.22 25);
+
+  /* TYPE */
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+}
+
+/* RESET */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{
+  background:var(--bg);color:var(--ink);
+  font-family:var(--font-sans);font-weight:300;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+body{cursor:none}
+
+/* GRAIN OVERLAY */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:9000;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.18 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  opacity:.5;mix-blend-mode:overlay;
+}
+/* VIGNETTE */
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:8000;
+  background: radial-gradient(ellipse 90% 80% at 50% 50%, transparent 50%, rgba(0,0,0,.55) 100%);
+}
+
+/* TYPE UTILITIES */
+.display{font-family:var(--font-display);font-weight:400;letter-spacing:.01em;line-height:.9}
+.mono{font-family:var(--font-mono);font-weight:400;letter-spacing:.04em}
+.label{font-family:var(--font-mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-dim)}
+.label-sm{font-family:var(--font-mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-mute)}
+
+/* GENERIC ELEMENTS */
+a{color:inherit;cursor:none}
+button{cursor:none;font-family:inherit;color:inherit}
+
+/* SHARED BUTTON */
+.btn{
+  display:inline-flex;align-items:center;gap:14px;
+  padding:16px 24px;
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.24em;text-transform:uppercase;
+  border:1px solid var(--line-2);background:transparent;color:var(--ink);
+  cursor:none;transition:all .2s;
+  position:relative;
+}
+.btn:hover{border-color:var(--neon);color:var(--neon)}
+.btn .arrow{display:inline-block;transition:transform .2s}
+.btn:hover .arrow{transform:translateX(4px)}
+.btn--neon{background:var(--neon);color:var(--bg);border-color:var(--neon)}
+.btn--neon:hover{background:transparent;color:var(--neon)}
+
+/* SHARED ICON */
+.play-icon{
+  width:0;height:0;border-left:10px solid currentColor;
+  border-top:7px solid transparent;border-bottom:7px solid transparent;
+}

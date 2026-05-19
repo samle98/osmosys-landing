@@ -1,0 +1,132 @@
+/* ============================================================
+   hero.css — sección principal: fondo, partículas, cintas,
+   texto, CTA y preview lateral
+   ============================================================ */
+
+.hero{
+  position:relative;width:100%;height:100vh;min-height:720px;
+  overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 30% 40%, rgba(20,20,20,1) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 60% at 80% 70%, rgba(18,40,55,.6) 0%, transparent 60%),
+    var(--bg);
+}
+.hero-video{
+  position:absolute;inset:0;z-index:1;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0 1px, transparent 1px 3px),
+    linear-gradient(120deg, #0c0c0c 0%, #101418 40%, #0a0a0a 80%);
+  overflow:hidden;
+}
+
+/* PARTÍCULAS */
+.particles{position:absolute;inset:0;z-index:2;pointer-events:none}
+.particles span{
+  position:absolute;width:2px;height:2px;background:var(--ink);border-radius:50%;opacity:.3;
+  animation:drift 20s linear infinite;
+}
+@keyframes drift{
+  0%{transform:translateY(0) translateX(0);opacity:0}
+  10%{opacity:.4}
+  90%{opacity:.4}
+  100%{transform:translateY(-100vh) translateX(20px);opacity:0}
+}
+
+/* CINTAS HORIZONTALES */
+.tape-strip{
+  position:absolute;left:0;right:0;height:14px;z-index:5;
+  background:repeating-linear-gradient(90deg, var(--ink) 0 8px, transparent 8px 18px);
+  opacity:.12;
+}
+.tape-strip.top{top:78px}
+.tape-strip.bot{bottom:160px}
+
+/* TEXTO PRINCIPAL */
+.hero-content{
+  position:absolute;left:6%;top:50%;transform:translateY(-50%);
+  z-index:10;max-width:62%;
+}
+.hero-kicker{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.hero-kicker .rec-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--rec);
+  box-shadow:0 0 12px var(--rec);
+  animation:rec 1.4s ease-in-out infinite;
+}
+@keyframes rec{50%{opacity:.3}}
+.hero-kicker .label{color:var(--ink)}
+.hero-kicker .divider{width:40px;height:1px;background:var(--ink-mute)}
+
+.hero-title{
+  font-size:clamp(72px, 9vw, 138px);
+  line-height:1.0;
+  margin-bottom:40px;
+  color:var(--ink);
+}
+.hero-title .accent{
+  display:inline-block;
+  background:var(--neon);color:var(--bg);
+  padding:0 .12em .04em;margin:0 .04em;
+  position:relative;
+}
+.hero-title .accent::after{
+  content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.08) 0 1px, transparent 1px 3px);
+  pointer-events:none;
+}
+.hero-title .line2{display:block;color:var(--ink-dim);font-weight:400}
+
+.hero-body{
+  font-family:var(--font-sans);font-size:17px;line-height:1.55;
+  max-width:520px;color:var(--ink-dim);margin-bottom:36px;font-weight:300;
+}
+.hero-body strong{color:var(--ink);font-weight:500}
+
+.hero-cta{display:flex;align-items:center;gap:20px}
+
+/* PREVIEW LATERAL */
+.hero-preview{
+  position:absolute;right:5%;top:50%;transform:translateY(-50%);
+  z-index:10;width:30%;max-width:420px;
+}
+.preview-frame{
+  position:relative;aspect-ratio:4/3;
+  border:1px solid var(--line-2);
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.02) 0 1px, transparent 1px 4px),
+    radial-gradient(ellipse at 30% 40%, #161b22 0%, #0c0c0c 70%);
+  overflow:hidden;cursor:none;
+}
+.preview-frame:hover{border-color:var(--neon)}
+.preview-frame::before{
+  content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 2px, transparent 2px 4px);
+  pointer-events:none;mix-blend-mode:multiply;
+}
+.preview-corners{position:absolute;inset:10px;pointer-events:none}
+.preview-corners::before,.preview-corners::after{
+  content:"";position:absolute;width:14px;height:14px;border:1px solid var(--neon);
+}
+.preview-corners::before{top:0;left:0;border-right:none;border-bottom:none}
+.preview-corners::after{bottom:0;right:0;border-left:none;border-top:none}
+
+.preview-tl,.preview-br{
+  position:absolute;font-family:var(--font-mono);font-size:10px;letter-spacing:.18em;
+  color:var(--ink-dim);z-index:2;
+}
+.preview-tl{top:14px;left:14px}
+.preview-br{bottom:14px;right:14px;color:var(--neon)}
+
+.preview-play{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:64px;height:64px;border:1px solid var(--ink);border-radius:50%;
+  display:grid;place-items:center;color:var(--ink);
+  transition:all .2s;
+}
+.preview-frame:hover .preview-play{
+  border-color:var(--neon);color:var(--neon);
+  transform:translate(-50%,-50%) scale(1.08);
+}
+.preview-meta{margin-top:14px;display:flex;justify-content:space-between;align-items:center}

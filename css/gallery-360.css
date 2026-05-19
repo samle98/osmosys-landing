@@ -1,0 +1,150 @@
+/* ============================================================
+   gallery-360.css — Cápsula 02: galería panorámica 360°
+   ============================================================ */
+
+.gallery-360{
+  position:relative;
+  border:1px solid var(--line-2);
+  background:var(--bg);
+  overflow:hidden;
+  margin-bottom:32px;
+}
+
+/* ESCENARIO */
+.pano-stage{
+  position:relative;height:420px;
+  perspective:900px;perspective-origin:50% 60%;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse 80% 100% at 50% 100%, var(--neon-soft) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 50% 30%, rgba(232,228,220,.04), transparent 70%),
+    #060606;
+}
+/* Suelo en perspectiva */
+.pano-stage::before{
+  content:"";position:absolute;left:-20%;right:-20%;bottom:0;height:60%;
+  background-image:
+    linear-gradient(0deg, rgba(232,228,220,.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(232,228,220,.10) 1px, transparent 1px);
+  background-size:60px 30px;
+  transform:perspective(500px) rotateX(72deg);
+  transform-origin:50% 0%;
+  mask:linear-gradient(0deg, #000 0%, transparent 95%);
+  -webkit-mask:linear-gradient(0deg, #000 0%, transparent 95%);
+  pointer-events:none;
+}
+/* Línea de horizonte */
+.pano-stage::after{
+  content:"";position:absolute;left:0;right:0;top:42%;height:1px;
+  background:linear-gradient(90deg, transparent, var(--neon), transparent);
+  box-shadow:0 0 24px var(--neon);
+  opacity:.4;
+}
+
+/* IMAGEN PANORÁMICA PLACEHOLDER */
+.pano-image{
+  position:absolute;left:50%;top:50%;
+  width:140%;height:64%;
+  transform:translate(-50%,-50%) perspective(800px) rotateY(0deg);
+  transform-style:preserve-3d;
+  border:1px solid var(--line-2);
+  background:
+    linear-gradient(90deg, transparent 0, transparent calc(20% - 1px), rgba(232,228,220,.08) 20%, transparent calc(20% + 1px)),
+    linear-gradient(90deg, transparent 0, transparent calc(40% - 1px), rgba(232,228,220,.08) 40%, transparent calc(40% + 1px)),
+    linear-gradient(90deg, transparent 0, transparent calc(60% - 1px), rgba(232,228,220,.08) 60%, transparent calc(60% + 1px)),
+    linear-gradient(90deg, transparent 0, transparent calc(80% - 1px), rgba(232,228,220,.08) 80%, transparent calc(80% + 1px)),
+    repeating-linear-gradient(135deg, rgba(232,228,220,.06) 0 1px, transparent 1px 12px),
+    radial-gradient(ellipse 70% 100% at 50% 50%, var(--neon-soft), transparent 70%),
+    linear-gradient(180deg, #141714 0%, #0a0c0a 100%);
+  mask:linear-gradient(90deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
+  -webkit-mask:linear-gradient(90deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
+  transition:transform .25s ease;
+}
+.pano-image::before{
+  content:"";position:absolute;inset:0;
+  background:
+    linear-gradient(45deg, transparent calc(50% - 1px), rgba(232,228,220,.10) 50%, transparent calc(50% + 1px)),
+    linear-gradient(-45deg, transparent calc(50% - 1px), rgba(232,228,220,.10) 50%, transparent calc(50% + 1px));
+  pointer-events:none;
+}
+.pano-image .ph-label{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--ink-dim);text-align:center;
+}
+.pano-image .ph-label .play-ring{
+  width:64px;height:64px;border:1px solid var(--neon);border-radius:50%;
+  display:grid;place-items:center;color:var(--neon);
+  box-shadow:0 0 24px var(--neon-glow);
+}
+.pano-image .ph-label .dim{color:var(--ink-mute);font-size:10px;letter-spacing:.22em}
+
+.pano-image .crop{position:absolute;width:18px;height:18px;border:1px solid var(--neon)}
+.pano-image .crop.tl{top:10px;left:10px;border-right:none;border-bottom:none}
+.pano-image .crop.tr{top:10px;right:10px;border-left:none;border-bottom:none}
+.pano-image .crop.bl{bottom:10px;left:10px;border-right:none;border-top:none}
+.pano-image .crop.br{bottom:10px;right:10px;border-left:none;border-top:none}
+
+/* ÓRBITA CENTRAL */
+.pano-orbit{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:280px;height:280px;border:1px dashed var(--line-2);border-radius:50%;
+  animation:spin 40s linear infinite;pointer-events:none;
+}
+.pano-orbit::before,.pano-orbit::after{
+  content:"";position:absolute;width:6px;height:6px;background:var(--neon);border-radius:50%;
+  box-shadow:0 0 10px var(--neon);
+}
+.pano-orbit::before{top:-3px;left:50%;transform:translateX(-50%)}
+.pano-orbit::after{bottom:-3px;left:50%;transform:translateX(-50%);opacity:.5}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+
+/* HUD */
+.pano-hud{
+  position:absolute;inset:0;padding:18px 22px;pointer-events:none;
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+.pano-hud .top{display:flex;justify-content:space-between;align-items:start}
+.pano-hud .bot{display:flex;justify-content:space-between;align-items:end}
+.pano-tag{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.24em;color:var(--ink-dim);
+  text-transform:uppercase;
+}
+.pano-tag.live::before{content:"●  ";color:var(--rec)}
+
+.crosshair-c{width:24px;height:24px;position:relative}
+.crosshair-c::before,.crosshair-c::after{content:"";position:absolute;background:var(--neon);opacity:.7}
+.crosshair-c::before{top:50%;left:0;right:0;height:1px;transform:translateY(-50%)}
+.crosshair-c::after{left:50%;top:0;bottom:0;width:1px;transform:translateX(-50%)}
+
+.drag-hint{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.2em;color:var(--ink-dim);
+  text-transform:uppercase;display:flex;align-items:center;gap:8px;
+}
+.drag-hint .arrows{color:var(--neon)}
+
+/* COMPASS */
+.pano-compass{
+  margin-top:0;padding:14px 22px;
+  border-top:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;color:var(--ink-dim);
+}
+.pano-compass .scale{display:flex;gap:2px;align-items:end;height:14px;flex:1;margin:0 28px}
+.pano-compass .scale i{display:block;width:3px;background:var(--line-2);height:6px}
+.pano-compass .scale i.tall{height:14px}
+.pano-compass .scale i.on{background:var(--neon)}
+
+/* META / STATS */
+.cap-02-meta{display:flex;justify-content:space-between;align-items:end;gap:32px}
+.cap-02-meta .left{max-width:540px}
+.cap-02-meta .left h3{font-family:var(--font-display);font-size:42px;line-height:.95;margin-bottom:14px}
+.cap-02-meta .left p{font-size:15px;line-height:1.5;color:var(--ink-dim)}
+.cap-02-meta .stats{display:flex;gap:32px}
+.cap-02-meta .stat{text-align:right}
+.cap-02-meta .stat .num{font-family:var(--font-display);font-size:48px;line-height:1;color:var(--neon)}
+.cap-02-meta .stat .lab{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.22em;color:var(--ink-dim);
+  text-transform:uppercase;margin-top:4px;
+}

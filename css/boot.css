@@ -1,0 +1,42 @@
+/* ============================================================
+   boot.css — pantalla de arranque inicial
+   ============================================================ */
+
+.boot{
+  position:fixed;inset:0;z-index:9800;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .4s, visibility .4s;
+}
+.boot.done{opacity:0;visibility:hidden}
+.boot-inner{width:min(560px,90vw)}
+
+.boot-logo{
+  display:flex;align-items:center;gap:14px;margin-bottom:24px;
+  opacity:0;animation:fadeIn .4s .1s forwards;
+}
+.boot-logo img{width:42px;height:42px}
+.boot-logo .word{font-family:var(--font-display);font-size:24px;letter-spacing:.24em}
+
+.boot-lines{font-family:var(--font-mono);font-size:13px;line-height:1.7;color:var(--ink-dim)}
+.boot-lines div{opacity:0;transform:translateY(4px);animation:bootLine .25s ease forwards}
+.boot-lines div:nth-child(1){animation-delay:.3s}
+.boot-lines div:nth-child(2){animation-delay:.6s}
+.boot-lines div:nth-child(3){animation-delay:.9s}
+.boot-lines div:nth-child(4){animation-delay:1.2s}
+.boot-lines div:nth-child(5){animation-delay:1.5s}
+.boot-lines b{color:var(--neon);font-weight:400}
+
+.boot-bar{
+  margin-top:24px;height:2px;background:var(--line);
+  position:relative;overflow:hidden;
+  opacity:0;animation:fadeIn .3s .3s forwards;
+}
+.boot-bar::after{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:0;background:var(--neon);
+  animation:bootFill 2s ease-out forwards;
+  box-shadow:0 0 12px var(--neon);
+}
+
+@keyframes bootLine{to{opacity:1;transform:none}}
+@keyframes fadeIn{to{opacity:1}}
+@keyframes bootFill{to{width:100%}}

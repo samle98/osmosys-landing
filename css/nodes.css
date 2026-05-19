@@ -1,0 +1,63 @@
+/* ============================================================
+   nodes.css — tira de nodos seleccionables (cápsulas 01–05)
+   ============================================================ */
+
+.nodes-wrap{
+  position:relative;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  background:var(--bg-2);
+}
+.nodes{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:0;
+  position:relative;
+}
+.nodes::before{
+  content:"";position:absolute;left:10%;right:10%;top:50%;height:1px;
+  background:linear-gradient(90deg, transparent, var(--line-2) 10%, var(--line-2) 90%, transparent);
+  z-index:0;
+}
+
+.node{
+  position:relative;z-index:1;
+  padding:28px 18px;cursor:none;text-align:left;
+  border-right:1px solid var(--line);
+  background:transparent;color:var(--ink);
+  border-top:none;border-bottom:none;border-left:none;
+  font-family:var(--font-sans);
+  transition:background .15s, color .15s;
+  overflow:hidden;
+}
+.node:last-child{border-right:none}
+.node .n{
+  font-family:var(--font-display);font-size:38px;line-height:1;
+  color:var(--ink-mute);transition:color .15s;
+  display:block;margin-bottom:8px;
+}
+.node .t{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink-dim);transition:color .15s;
+}
+.node .desc{
+  font-family:var(--font-sans);font-size:11px;line-height:1.4;color:var(--ink-mute);
+  margin-top:6px;max-width:90%;
+  opacity:0;transform:translateY(4px);transition:opacity .2s, transform .2s;
+}
+
+.node:hover{background:var(--bg-3)}
+.node:hover .n{color:var(--ink)}
+.node:hover .t{color:var(--ink)}
+.node:hover .desc{opacity:1;transform:translateY(0)}
+
+.node[data-active="true"]{background:var(--ink);color:var(--bg)}
+.node[data-active="true"] .n{color:var(--bg)}
+.node[data-active="true"] .t{color:var(--bg)}
+.node[data-active="true"] .desc{color:rgba(10,10,10,.65);opacity:1;transform:none}
+.node[data-active="true"]::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--neon);
+}
+.node[data-active="true"]::after{
+  content:"";position:absolute;left:50%;top:-1px;width:10px;height:10px;background:var(--neon);
+  transform:translateX(-50%) rotate(45deg);
+  box-shadow:0 0 16px var(--neon);
+}

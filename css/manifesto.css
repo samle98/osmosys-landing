@@ -1,0 +1,38 @@
+/* ============================================================
+   manifesto.css — Cápsula 01: manifiesto + tarjeta de descarga
+   ============================================================ */
+
+.cap-01-grid{
+  display:grid;grid-template-columns:1.6fr 1fr;gap:64px;align-items:start;
+}
+
+.manifesto{
+  font-family:var(--font-sans);font-weight:300;font-size:28px;line-height:1.35;
+  color:var(--ink);text-wrap:pretty;
+}
+.manifesto .h{background:var(--neon);color:var(--bg);padding:0 6px}
+.manifesto p+p{margin-top:22px}
+.manifesto .sig{
+  margin-top:36px;font-family:var(--font-mono);font-size:12px;letter-spacing:.22em;
+  color:var(--ink-dim);
+}
+
+.manifesto-aside{display:flex;flex-direction:column;gap:24px}
+
+.doc-card{
+  border:1px solid var(--line-2);padding:22px;background:var(--bg-2);position:relative;
+}
+.doc-card h4{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--ink-dim);font-weight:400;margin-bottom:10px;
+}
+.doc-card .filename{
+  font-family:var(--font-mono);font-size:14px;color:var(--ink);margin-bottom:4px;
+}
+.doc-card .filesize{
+  font-family:var(--font-mono);font-size:11px;color:var(--ink-mute);margin-bottom:18px;
+}
+.doc-card .corner-mark{
+  position:absolute;top:14px;right:14px;width:8px;height:8px;
+  background:var(--neon);box-shadow:0 0 12px var(--neon);
+}
