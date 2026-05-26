@@ -4,7 +4,7 @@
 (() => {
   const CAP = {
     '01': { title:'arte',    kicker:'MANIFIESTO',  lead:'Osmosys es un colectivo donde el <strong>arte</strong> y la <strong>tecnología</strong> se filtran entre sí. Cinco cápsulas para entrar a nuestro proceso — manifiesto, obras, laboratorio, comunidad, invitación.',
-            thumb: 'https://img.youtube.com/vi/NNCn_22HpJw/hqdefault.jpg', duration: '00:00' },
+            thumb: 'https://img.youtube.com/vi/NNCn_22HpJw/hqdefault.jpg', duration: '2:46' },
     '02': { title:'obras',   kicker:'CREACIONES',  lead:'Doce piezas habitan un espacio panorámico de 360°. Entra, escucha, vuelve. Cada obra vive en su propio nicho dentro de la sala.',
             thumb: '', duration: '' },
     '03': { title:'proceso', kicker:'LABORATORIO', lead:'Tres instrumentos abiertos en el navegador. Mueve, escucha, exporta. Lo que hagas queda guardado en el archivo del colectivo.',
