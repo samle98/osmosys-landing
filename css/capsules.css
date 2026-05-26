@@ -34,60 +34,58 @@
 }
 .cap-head .meta b{color:var(--neon);font-weight:400}
 
-/* ── Cápsula 01: reproductor de video ───────────────────── */
-.cap-video-wrap{
+/* ── Modal de video YouTube ──────────────────────────────── */
+.yt-modal{
+  position:fixed;inset:0;z-index:9850;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.88);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  opacity:0;visibility:hidden;
+  transition:opacity .3s, visibility .3s;
+}
+
+.yt-modal.on{
+  opacity:1;visibility:visible;
+}
+
+.yt-modal-box{
   position:relative;
-  margin-bottom:40px;
+  width:min(900px, 92vw);
   border:1px solid var(--line-2);
   background:#060606;
-  overflow:hidden;
-  cursor:none;
+  box-shadow:0 0 80px rgba(0,0,0,.7);
 }
 
-.cap-video-wrap video{
-  display:block;
-  width:100%;
+/* Esquinas neon */
+.yt-modal-box::before,.yt-modal-box::after{
+  content:"";position:absolute;
+  width:18px;height:18px;
+  border:1px solid var(--neon);
+}
+.yt-modal-box::before{top:10px;left:10px;border-right:none;border-bottom:none}
+.yt-modal-box::after {bottom:10px;right:10px;border-left:none;border-top:none}
+
+.yt-iframe-wrap{
+  position:relative;
   aspect-ratio:16/9;
-  object-fit:contain;
-  background:#060606;
 }
 
-/* Overlay con botón de play (se oculta al reproducir) */
-.cap-video-overlay{
+.yt-iframe-wrap iframe{
   position:absolute;inset:0;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  gap:16px;
-  background:rgba(6,6,6,.55);
-  transition:opacity .3s, visibility .3s;
-  cursor:none;
+  width:100%;height:100%;
+  border:none;display:block;
 }
 
-.cap-video-overlay.hidden{
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
+.yt-modal-close{
+  position:absolute;top:10px;right:10px;z-index:2;
+  background:none;border:none;
+  color:var(--ink-dim);
+  font-family:var(--font-mono);font-size:16px;
+  line-height:1;padding:4px 8px;
+  cursor:none;transition:color .2s;
 }
-
-.cap-video-play-btn{
-  width:72px;height:72px;
-  border:1px solid var(--ink);
-  border-radius:50%;
-  display:grid;place-items:center;
-  color:var(--ink);
-  transition:border-color .2s, color .2s, transform .2s;
-}
-
-.cap-video-wrap:hover .cap-video-play-btn{
-  border-color:var(--neon);
-  color:var(--neon);
-  transform:scale(1.08);
-}
-
-/* Barra de progreso neon */
-.cap-video-wrap video::-webkit-media-controls-panel{
-  background:rgba(6,6,6,.9);
-}
+.yt-modal-close:hover{color:var(--neon)}
 
 /* ── Cápsula 05: archivo colectivo ──────────────────────── */
 .cap05-subtitle{

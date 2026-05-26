@@ -35,29 +35,32 @@
 
   nodes.forEach(n => n.addEventListener('click', () => setCap(n.dataset.cap)));
 
-  // ── Video cap-01 ──────────────────────────────────────────
-  const video   = document.getElementById('cap01Video');
-  const overlay = document.getElementById('cap01VideoOverlay');
+  // ── Modal YouTube ─────────────────────────────────────────
+  const YT_EMBED = 'https://www.youtube.com/embed/NNCn_22HpJw?autoplay=1&rel=0';
+  const ytModal  = document.getElementById('ytModal');
+  const ytFrame  = document.getElementById('ytFrame');
+  const ytClose  = document.getElementById('ytModalClose');
 
-  function playVideo() {
-    if (!video) return;
-    overlay?.classList.add('hidden');
-    video.controls = true;
-    video.play();
-    video.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  function openVideo() {
+    if (!ytModal) return;
+    ytFrame.src = YT_EMBED;      // autoplay al asignar src
+    ytModal.classList.add('on');
   }
 
-  // Click en el overlay del video
-  overlay?.addEventListener('click', playVideo);
+  function closeVideo() {
+    ytFrame.src = '';             // vaciar src detiene el video sin recargar nada
+    ytModal.classList.remove('on');
+  }
+
+  ytClose?.addEventListener('click', closeVideo);
+  ytModal?.addEventListener('click', e => { if (e.target === ytModal) closeVideo(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVideo(); });
 
   // Botón "Reproducir cápsula" del hero
   document.querySelector('.hero-cta .btn--neon')
-    ?.addEventListener('click', () => {
-      const active = document.querySelector('.node[data-active="true"]')?.dataset.cap;
-      if (active === '01') playVideo();
-    });
+    ?.addEventListener('click', openVideo);
 
-  // Al pausar/terminar: volver a mostrar el overlay
-  video?.addEventListener('pause',   () => { if (video.ended || video.paused) overlay?.classList.remove('hidden'); });
-  video?.addEventListener('ended',   () => overlay?.classList.remove('hidden'));
+  // Tarjeta de preview del hero (click en la imagen de la derecha)
+  document.querySelector('.preview-frame')
+    ?.addEventListener('click', openVideo);
 })();
