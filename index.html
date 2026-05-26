@@ -400,16 +400,29 @@
     </div>
   </div>
 
+  <!-- MODAL DE CRÉDITOS -->
+  <div class="credits-modal" id="creditsModal">
+    <div class="credits-box">
+      <button class="credits-close" id="creditsClose" aria-label="Cerrar">✕</button>
+      <h2 class="credits-title">CRÉDITOS.</h2>
+      <p class="credits-subtitle">// osmosys — colectivo de arte y tecnología</p>
+      <div class="credits-list">
+        <p class="credits-placeholder">Próximamente…</p>
+      </div>
+    </div>
+  </div>
+
   <!-- FOOTER -->
   <footer class="foot">
-    <span>© OSMOSYS 2026 </span>
+    <span>© OSMOSYS 2026</span>
     <div class="right">
-      <a href="#">RSS</a>
-      <a href="#" data-comment-anchor="429ca7e30b-a">Mastodon</a>
-      <a href="#">Newsletter</a>
-      <a href="#">Contacto</a>
+      <a href="https://www.instagram.com/osmosys.co" target="_blank" rel="noopener">Instagram</a>
+      <button class="foot-credits-btn" id="btnCredits">Créditos</button>
     </div>
   </footer>
+
+  <!-- Audio ambiente -->
+  <audio id="siteAudio" src="assets/SLEEPY%20BEATS.mp3" loop preload="none"></audio>
 
   <!-- Scripts: orden por dependencia / DOM. defer para no bloquear el parser. -->
   <script defer src="js/cursor.js"></script>
@@ -424,6 +437,7 @@
   <script defer src="js/supabase-client.js"></script>
   <script defer src="js/cap04-realtime.js"></script>
   <script defer src="js/cap05-realtime.js"></script>
+  <script defer src="js/credits.js"></script>
 
 </body>
 </html>

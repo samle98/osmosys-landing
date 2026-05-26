@@ -1,14 +1,81 @@
 /* ============================================================
-   footer.css — pie de página
+   footer.css — pie de página + modal de créditos
    ============================================================ */
 
 .foot{
   border-top:1px solid var(--line);
-  padding:22px 36px;
+  padding:28px 44px;
   display:flex;justify-content:space-between;align-items:center;
-  font-family:var(--font-mono);font-size:10px;letter-spacing:.22em;
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.22em;
   color:var(--ink-mute);text-transform:uppercase;
 }
-.foot .right{display:flex;gap:24px}
+.foot .right{display:flex;align-items:center;gap:28px}
 .foot a{color:inherit;text-decoration:none}
 .foot a:hover{color:var(--neon)}
+
+/* Botón "Créditos" con el mismo estilo de los links */
+.foot-credits-btn{
+  background:none;border:none;
+  font-family:var(--font-mono);font-size:12px;letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--ink-mute);
+  cursor:none;padding:0;
+  transition:color .2s;
+}
+.foot-credits-btn:hover{color:var(--neon)}
+
+/* ── Modal de créditos ───────────────────────────────────── */
+.credits-modal{
+  position:fixed;inset:0;z-index:9850;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.88);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  opacity:0;visibility:hidden;
+  transition:opacity .3s, visibility .3s;
+}
+.credits-modal.on{opacity:1;visibility:visible}
+
+.credits-box{
+  position:relative;
+  width:min(560px, 90vw);
+  border:1px solid var(--line-2);
+  background:var(--bg-2);
+  padding:40px 44px;
+}
+.credits-box::before,.credits-box::after{
+  content:"";position:absolute;width:18px;height:18px;border:1px solid var(--neon);
+}
+.credits-box::before{top:10px;left:10px;border-right:none;border-bottom:none}
+.credits-box::after {bottom:10px;right:10px;border-left:none;border-top:none}
+
+.credits-close{
+  position:absolute;top:12px;right:12px;
+  background:none;border:none;
+  color:var(--ink-dim);font-family:var(--font-mono);
+  font-size:16px;line-height:1;padding:4px 8px;
+  cursor:none;transition:color .2s;
+}
+.credits-close:hover{color:var(--neon)}
+
+.credits-title{
+  font-family:var(--font-display);font-size:64px;
+  line-height:.9;letter-spacing:.01em;
+  margin-bottom:8px;
+}
+.credits-subtitle{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.24em;
+  color:var(--ink-dim);margin-bottom:32px;
+}
+.credits-list{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;
+  color:var(--ink-dim);line-height:2;
+}
+.credits-list .credits-role{
+  color:var(--neon);font-size:10px;letter-spacing:.22em;
+  text-transform:uppercase;display:block;margin-top:16px;margin-bottom:4px;
+}
+.credits-placeholder{
+  color:var(--ink-mute);font-style:normal;
+}
+.credits-placeholder::before{content:"→ "; color:var(--neon)}
