@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Galería 360 — Osmosys</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: #060606;
+      overflow: hidden;
+    }
+
+    /* Three.js appends its canvas here */
+    canvas { display: block; }
+
+    /* ── Loading overlay ───────────────────────────────────── */
+    #loading {
+      position: fixed; inset: 0; z-index: 10;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 18px;
+      background: #060606;
+      transition: opacity .6s ease, visibility .6s ease;
+    }
+    #loading.done { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    #loading .wordmark {
+      font-family: 'Courier New', monospace;
+      font-size: 11px; letter-spacing: .28em; text-transform: uppercase;
+      color: #5a564e;
+    }
+    #loading .bar-wrap {
+      width: 200px; height: 1px; background: #262421; position: relative;
+    }
+    #loading .bar-fill {
+      position: absolute; left: 0; top: 0; bottom: 0;
+      background: #3693C8;
+      width: 0%;
+      box-shadow: 0 0 8px #3693C8;
+      transition: width .15s ease;
+    }
+    #loading .pct {
+      font-family: 'Courier New', monospace;
+      font-size: 10px; letter-spacing: .22em;
+      color: #3693C8;
+    }
+
+    /* ── Back link (aparece al hover en esquina) ───────────── */
+    #back {
+      position: fixed; top: 22px; left: 28px; z-index: 20;
+      font-family: 'Courier New', monospace;
+      font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+      color: #5a564e; text-decoration: none;
+      opacity: 0; transition: opacity .3s;
+    }
+    #back:hover { color: #3693C8; }
+    body:hover #back { opacity: 1; }
+
+    /* ── Info HUD (esquina inferior izquierda) ─────────────── */
+    #hud {
+      position: fixed; bottom: 22px; left: 28px; z-index: 20;
+      font-family: 'Courier New', monospace;
+      font-size: 10px; letter-spacing: .2em; line-height: 1.8;
+      color: #34322e;
+      pointer-events: none;
+      opacity: 0; transition: opacity .3s;
+    }
+    body:hover #hud { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <!-- Loading -->
+  <div id="loading">
+    <div class="wordmark">OSMOSYS // GALERÍA</div>
+    <div class="bar-wrap"><div class="bar-fill" id="barFill"></div></div>
+    <div class="pct" id="pct">0 %</div>
+  </div>
+
+  <!-- Back link (aparece al hover) -->
+  <a id="back" href="index.html">← volver</a>
+
+  <!-- HUD mínimo -->
+  <div id="hud">
+    arrastra para orbitar &nbsp;·&nbsp; scroll para zoom<br>
+    shift + arrastra para desplazar
+  </div>
+
+  <!-- Three.js importmap -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three":          "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+      "three/addons/":  "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE               from 'three';
+    import { GLTFLoader }           from 'three/addons/loaders/GLTFLoader.js';
+    import { OrbitControls }        from 'three/addons/controls/OrbitControls.js';
+    import { RGBELoader }           from 'three/addons/loaders/RGBELoader.js';
+
+    // ── Renderer ────────────────────────────────────────────
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      logarithmicDepthBuffer: true,
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
+    renderer.toneMapping       = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.85;
+    document.body.appendChild(renderer.domElement);
+
+    // ── Scene ───────────────────────────────────────────────
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x060606);
+    scene.fog        = new THREE.FogExp2(0x060606, 0.04);
+
+    // ── Camera ──────────────────────────────────────────────
+    const camera = new THREE.PerspectiveCamera(
+      72,                                         // FOV cómodo para interior
+      window.innerWidth / window.innerHeight,
+      0.01,
+      500
+    );
+    camera.position.set(0, 1.6, 0);              // ojo humano antes de cargar el modelo
+
+    // ── Controls ────────────────────────────────────────────
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping  = true;
+    controls.dampingFactor  = 0.06;
+    controls.minDistance    = 0.1;
+    controls.maxDistance    = 80;
+    controls.target.set(0, 1.6, -1);
+    controls.update();
+
+    // ── Iluminación base ────────────────────────────────────
+    // Ambiente: ilumina el interior uniformemente
+    const ambient = new THREE.AmbientLight(0xffffff, 0.55);
+    scene.add(ambient);
+
+    // Hemisférica: simula luz de techo difusa
+    const hemi = new THREE.HemisphereLight(0xe8e4dc, 0x1a1614, 0.40);
+    scene.add(hemi);
+
+    // Direccional principal (desde arriba)
+    const sun = new THREE.DirectionalLight(0xf0ece4, 0.70);
+    sun.position.set(0, 8, 4);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.camera.near  = 0.1;
+    sun.shadow.camera.far   = 60;
+    sun.shadow.camera.left  = -20;
+    sun.shadow.camera.right = 20;
+    sun.shadow.camera.top   = 20;
+    sun.shadow.camera.bottom = -20;
+    sun.shadow.bias = -0.001;
+    scene.add(sun);
+
+    // ── Carga del modelo GLB ─────────────────────────────────
+    const loadingEl = document.getElementById('loading');
+    const barFill   = document.getElementById('barFill');
+    const pctEl     = document.getElementById('pct');
+
+    const loader = new GLTFLoader();
+    loader.load(
+      'assets/GALERIA_PRUEBA.glb',
+
+      // onLoad
+      (gltf) => {
+        const model = gltf.scene;
+
+        // Activar sombras en todos los meshes del modelo
+        model.traverse(node => {
+          if (node.isMesh) {
+            node.castShadow    = true;
+            node.receiveShadow = true;
+            // Si el material es muy oscuro, aumentar algo el emissive
+            if (node.material) {
+              const m = node.material;
+              if (Array.isArray(m)) m.forEach(mat => mat.envMapIntensity = 0.6);
+              else if (m.envMapIntensity !== undefined) m.envMapIntensity = 0.6;
+            }
+          }
+        });
+
+        scene.add(model);
+
+        // ── Centrar y enraizar el modelo ───────────────────
+        const box    = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        const size   = box.getSize(new THREE.Vector3());
+
+        // Centrar en X y Z; piso en Y = 0
+        model.position.x -= center.x;
+        model.position.z -= center.z;
+        model.position.y -= box.min.y;
+
+        // Recalcular tras mover
+        box.setFromObject(model);
+
+        // ── Posicionar cámara a altura de ojos dentro del modelo
+        const eyeY = Math.min(1.6, box.max.y * 0.5);   // nunca por encima del techo
+        const lookFwd = Math.min(size.z * 0.25, 3);     // 25% de profundidad, max 3 m
+
+        camera.position.set(0, eyeY, 0);
+        controls.target.set(0, eyeY, -lookFwd);
+        controls.update();
+
+        // Actualizar shadow camera al tamaño real
+        const halfW = size.x / 2 + 2;
+        const halfD = size.z / 2 + 2;
+        sun.position.set(0, size.y + 4, lookFwd);
+        sun.shadow.camera.left   = -halfW;
+        sun.shadow.camera.right  =  halfW;
+        sun.shadow.camera.top    =  size.y + 4;
+        sun.shadow.camera.bottom = -2;
+        sun.shadow.camera.updateProjectionMatrix();
+
+        // Ocultar overlay de carga
+        barFill.style.width = '100%';
+        pctEl.textContent   = '100 %';
+        setTimeout(() => loadingEl.classList.add('done'), 300);
+      },
+
+      // onProgress
+      (xhr) => {
+        if (xhr.lengthComputable) {
+          const p = Math.round((xhr.loaded / xhr.total) * 100);
+          barFill.style.width = p + '%';
+          pctEl.textContent   = p + ' %';
+        }
+      },
+
+      // onError
+      (err) => {
+        console.error('Error cargando el modelo:', err);
+        pctEl.textContent = 'error al cargar el modelo';
+        pctEl.style.color = '#e8673a';
+      }
+    );
+
+    // ── Resize ───────────────────────────────────────────────
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // ── Loop ─────────────────────────────────────────────────
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
+
+</body>
+</html>
