@@ -77,8 +77,19 @@
         <div class="replies-header" id="repliesHeader">// respuestas</div>
         <div id="repliesList"></div>
 
-        <!-- Formulario de respuesta (solo para usuarios autenticados) -->
+        <!-- Formulario de respuesta: abierto sin cuenta -->
         <form id="replyForm" class="reply-form" hidden>
+          <div class="form-group" id="replyNombreGroup">
+            <label class="form-label" for="replyNombre">Tu nombre</label>
+            <input
+              id="replyNombre"
+              class="form-input"
+              type="text"
+              placeholder="cómo te llamás"
+              maxlength="30"
+              autocomplete="nickname"
+            >
+          </div>
           <div class="form-group">
             <label class="form-label" for="replyBody">Tu respuesta</label>
             <textarea
@@ -93,11 +104,6 @@
             Responder <span class="arrow">→</span>
           </button>
         </form>
-
-        <!-- Prompt de login (para no autenticados) -->
-        <p id="replyLoginPrompt" class="reply-login-prompt" hidden>
-          <button id="replyLoginBtn">Inicia sesión</button> para responder este hilo.
-        </p>
       </section>
 
     </div>
@@ -114,6 +120,17 @@
         </h2>
 
         <form id="nuevoForm">
+          <div class="form-group" id="nuevoNombreGroup">
+            <label class="form-label" for="nuevoNombre">Tu nombre</label>
+            <input
+              id="nuevoNombre"
+              class="form-input"
+              type="text"
+              placeholder="cómo firmás el hilo"
+              maxlength="30"
+              autocomplete="nickname"
+            >
+          </div>
           <div class="form-group">
             <label class="form-label" for="nuevoTitle">Título</label>
             <input

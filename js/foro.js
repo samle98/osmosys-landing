@@ -37,7 +37,7 @@
     return `hace ${Math.floor(h / 24)}d`;
   }
 
-  function showEl(el, show = true) { el.hidden = !show }
+  function showEl(el, show = true) { if (el) el.hidden = !show }
 
   function setMsg(el, msg, isError = true) {
     el.textContent = msg ?? '';
@@ -161,7 +161,7 @@
 
     const { data, error } = await supa
       .from('threads')
-      .select('id, title, badge, reply_count, updated_at, profiles(username)')
+      .select('id, title, badge, reply_count, updated_at, author_name, profiles(username)')
       .order('updated_at', { ascending: false })
       .limit(50);
 
@@ -189,7 +189,7 @@
         </div>
         <h3>${esc(t.title)}</h3>
         <div class="meta">
-          <span class="user">@${esc(t.profiles?.username ?? 'anon')}</span>
+          <span class="user">@${esc(t.profiles?.username ?? t.author_name ?? 'anon')}</span>
           <span class="replies">${t.reply_count} respuesta${t.reply_count !== 1 ? 's' : ''}</span>
         </div>
       </article>`).join('');
@@ -219,7 +219,7 @@
     // Hilo
     const { data: thread, error: tErr } = await supa
       .from('threads')
-      .select('id, title, body, badge, reply_count, created_at, profiles(username)')
+      .select('id, title, body, badge, reply_count, created_at, author_name, profiles(username)')
       .eq('id', id)
       .single();
 
@@ -236,7 +236,7 @@
         <h2 class="thread-title">${esc(thread.title)}</h2>
         <div class="thread-body-text">${esc(thread.body)}</div>
         <div class="thread-meta-row">
-          <span class="author">@${esc(thread.profiles?.username ?? 'anon')}</span>
+          <span class="author">@${esc(thread.profiles?.username ?? thread.author_name ?? 'anon')}</span>
           <span>${timeAgo(thread.created_at)}</span>
         </div>
       </div>`;
@@ -244,7 +244,7 @@
     // Respuestas
     const { data: replies } = await supa
       .from('replies')
-      .select('id, body, created_at, profiles(username)')
+      .select('id, body, created_at, author_name, profiles(username)')
       .eq('thread_id', id)
       .order('created_at', { ascending: true });
 
@@ -255,14 +255,15 @@
       repliesEl.innerHTML = replies.map(renderReplyCard).join('');
     }
 
-    // Formulario de respuesta
-    if (user) {
-      showEl(replyForm, true);
-      showEl(loginPrompt, false);
-      replyForm.dataset.threadId = id;
-    } else {
-      showEl(replyForm, false);
-      showEl(loginPrompt, true);
+    // Formulario de respuesta: siempre visible, sin requisito de cuenta
+    showEl(replyForm, true);
+    replyForm.dataset.threadId = id;
+    const replyNombreGroup = document.getElementById('replyNombreGroup');
+    showEl(replyNombreGroup, !user); // campo nombre solo si no está logueado
+    if (!user) {
+      const saved = localStorage.getItem('osm_guest_name');
+      const replyNombreEl = document.getElementById('replyNombre');
+      if (replyNombreEl && saved) replyNombreEl.value = saved;
     }
 
     // Realtime: nuevas respuestas
@@ -271,8 +272,12 @@
         event: 'INSERT', schema: 'public', table: 'replies',
         filter: `thread_id=eq.${id}`,
       }, async payload => {
-        const { data: profile } = await supa
-          .from('profiles').select('username').eq('id', payload.new.author_id).single();
+        let profile = null;
+        if (payload.new.author_id) {
+          const { data } = await supa
+            .from('profiles').select('username').eq('id', payload.new.author_id).single();
+          profile = data;
+        }
         repliesEl.insertAdjacentHTML(
           'beforeend',
           renderReplyCard({ ...payload.new, profiles: profile }),
@@ -285,10 +290,11 @@
   }
 
   function renderReplyCard(r) {
+    const name = r.profiles?.username ?? r.author_name ?? 'anon';
     return `
       <div class="reply-card">
         <div class="reply-meta">
-          <span class="reply-author">@${esc(r.profiles?.username ?? 'anon')}</span>
+          <span class="reply-author">@${esc(name)}</span>
           <span>${timeAgo(r.created_at)}</span>
         </div>
         <div class="reply-body">${esc(r.body)}</div>
@@ -303,13 +309,22 @@
     const body     = bodyEl.value.trim();
     setMsg(msgEl, null);
 
-    if (!body)  { setMsg(msgEl, 'La respuesta no puede estar vacía.'); return; }
-    if (!user)  { setMsg(msgEl, 'Debes iniciar sesión.'); return; }
+    if (!body) { setMsg(msgEl, 'La respuesta no puede estar vacía.'); return; }
 
-    const btn  = e.target.querySelector('button[type="submit"]');
+    // Nombre: del perfil si está logueado, del campo si no
+    const nombre = user
+      ? (user.user_metadata?.username ?? user.email.split('@')[0])
+      : document.getElementById('replyNombre')?.value.trim() ?? '';
+    if (!nombre) { setMsg(msgEl, 'Por favor ingresá tu nombre.'); return; }
+    if (!user) localStorage.setItem('osm_guest_name', nombre);
+
+    const btn = e.target.querySelector('button[type="submit"]');
     btn.disabled = true;
     const { error } = await supa.from('replies').insert({
-      thread_id: threadId, body, author_id: user.id,
+      thread_id:   threadId,
+      body,
+      author_id:   user?.id ?? null,
+      author_name: nombre,
     });
     btn.disabled = false;
 
@@ -319,8 +334,18 @@
 
   // ── Vista: nuevo hilo ─────────────────────────────────────
   function showNuevo() {
-    if (!user) { openAuth('login'); return; }
     showView('nuevo');
+    // Mostrar campo de nombre solo si no está logueado
+    const nuevoNombreGroup = document.getElementById('nuevoNombreGroup');
+    showEl(nuevoNombreGroup, !user);
+    const nuevoNombreEl = document.getElementById('nuevoNombre');
+    if (nuevoNombreEl) {
+      if (user) nuevoNombreEl.value = user.user_metadata?.username ?? '';
+      else {
+        const saved = localStorage.getItem('osm_guest_name');
+        if (saved) nuevoNombreEl.value = saved;
+      }
+    }
   }
 
   async function handleNuevoSubmit(e) {
@@ -334,11 +359,18 @@
     if (!title) { setMsg(msgEl, 'El título es obligatorio.'); return; }
     if (!body)  { setMsg(msgEl, 'El mensaje es obligatorio.'); return; }
 
-    const btn  = e.target.querySelector('button[type="submit"]');
+    // Nombre: del perfil si está logueado, del campo si no
+    const nombre = user
+      ? (user.user_metadata?.username ?? user.email.split('@')[0])
+      : document.getElementById('nuevoNombre')?.value.trim() ?? '';
+    if (!nombre) { setMsg(msgEl, 'Por favor ingresá tu nombre.'); return; }
+    if (!user) localStorage.setItem('osm_guest_name', nombre);
+
+    const btn = e.target.querySelector('button[type="submit"]');
     btn.disabled = true;
     const { data, error } = await supa
       .from('threads')
-      .insert({ title, body, badge, author_id: user.id })
+      .insert({ title, body, badge, author_id: user?.id ?? null, author_name: nombre })
       .select('id')
       .single();
     btn.disabled = false;
@@ -398,19 +430,17 @@
 
     // Botones principales
     document.getElementById('btnNuevo').onclick = () => {
-      if (!user) { openAuth('login'); return; }
       location.hash = '#/nuevo';
     };
 
     // Reply form
-    document.getElementById('replyForm').onsubmit       = handleReplySubmit;
-    document.getElementById('replyLoginBtn').onclick     = () => openAuth('login');
+    document.getElementById('replyForm').onsubmit = handleReplySubmit;
 
     // Nuevo form
     document.getElementById('nuevoForm').onsubmit = handleNuevoSubmit;
 
     // Hover en botones estáticos
-    attachHover(document.querySelectorAll('.auth-close, #btnNuevo, #replyLoginBtn, #authToggleBtn, .form-input, .form-textarea'));
+    attachHover(document.querySelectorAll('.auth-close, #btnNuevo, #authToggleBtn, .form-input, .form-textarea'));
 
     // Router
     window.addEventListener('hashchange', route);

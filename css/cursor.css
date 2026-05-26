@@ -5,7 +5,7 @@
 .cursor-ring{
   position:fixed;width:28px;height:28px;
   border:1px solid var(--neon);border-radius:50%;
-  pointer-events:none;z-index:9500;
+  pointer-events:none;z-index:9950;   /* por encima de modales (9700) y tweaks (9600) */
   transform:translate(-50%,-50%);
   transition:width .15s, height .15s, background .15s, border-color .15s;
   mix-blend-mode:difference;
@@ -13,7 +13,7 @@
 .cursor-dot{
   position:fixed;width:4px;height:4px;
   background:var(--neon);border-radius:50%;
-  pointer-events:none;z-index:9501;
+  pointer-events:none;z-index:9951;
   transform:translate(-50%,-50%);
   box-shadow:0 0 10px var(--neon);
 }

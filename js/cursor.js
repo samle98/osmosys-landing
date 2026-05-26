@@ -1,31 +1,18 @@
-// cursor.js — cursor personalizado (anillo con lerp + punto fijo)
-// y estado :hover para elementos interactivos.
+// cursor.js — cursor personalizado: punto y anillo se mueven juntos,
+// sin lerp. Hover en elementos interactivos agranda el anillo.
 
 (() => {
   const ring = document.getElementById('cursorRing');
-  const dot = document.getElementById('cursorDot');
-
-  let cx = window.innerWidth / 2;
-  let cy = window.innerHeight / 2;
-  let rx = cx, ry = cy;
+  const dot  = document.getElementById('cursorDot');
 
   window.addEventListener('mousemove', e => {
-    cx = e.clientX;
-    cy = e.clientY;
-    dot.style.left = cx + 'px';
-    dot.style.top = cy + 'px';
+    const x = e.clientX + 'px';
+    const y = e.clientY + 'px';
+    dot.style.left  = x;  dot.style.top  = y;
+    ring.style.left = x;  ring.style.top = y;
   });
 
-  function tick(){
-    rx += (cx - rx) * 0.22;
-    ry += (cy - ry) * 0.22;
-    ring.style.left = rx + 'px';
-    ring.style.top = ry + 'px';
-    requestAnimationFrame(tick);
-  }
-  tick();
-
-  const hoverables = 'a, button, .node, .thread, .dropzone, .preview-frame';
+  const hoverables = 'a, button, .node, .thread, .dropzone, .preview-frame, .form-input, .form-textarea, .form-select';
   document.querySelectorAll(hoverables).forEach(el => {
     el.addEventListener('mouseenter', () => ring.classList.add('hover'));
     el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
