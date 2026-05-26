@@ -34,6 +34,61 @@
 }
 .cap-head .meta b{color:var(--neon);font-weight:400}
 
+/* ── Cápsula 01: reproductor de video ───────────────────── */
+.cap-video-wrap{
+  position:relative;
+  margin-bottom:40px;
+  border:1px solid var(--line-2);
+  background:#060606;
+  overflow:hidden;
+  cursor:none;
+}
+
+.cap-video-wrap video{
+  display:block;
+  width:100%;
+  aspect-ratio:16/9;
+  object-fit:contain;
+  background:#060606;
+}
+
+/* Overlay con botón de play (se oculta al reproducir) */
+.cap-video-overlay{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:16px;
+  background:rgba(6,6,6,.55);
+  transition:opacity .3s, visibility .3s;
+  cursor:none;
+}
+
+.cap-video-overlay.hidden{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+
+.cap-video-play-btn{
+  width:72px;height:72px;
+  border:1px solid var(--ink);
+  border-radius:50%;
+  display:grid;place-items:center;
+  color:var(--ink);
+  transition:border-color .2s, color .2s, transform .2s;
+}
+
+.cap-video-wrap:hover .cap-video-play-btn{
+  border-color:var(--neon);
+  color:var(--neon);
+  transform:scale(1.08);
+}
+
+/* Barra de progreso neon */
+.cap-video-wrap video::-webkit-media-controls-panel{
+  background:rgba(6,6,6,.9);
+}
+
 /* ── Cápsula 05: archivo colectivo ──────────────────────── */
 .cap05-subtitle{
   font-size:16px;line-height:1.55;color:var(--ink-dim);

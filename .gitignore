@@ -1,3 +1,11 @@
 .DS_Store
 Thumbs.db
 desktop.ini
+
+.vercel
+
+# Archivos de video grandes (usar hosting externo en producción)
+*.mp4
+*.MP4
+*.mov
+*.MOV
