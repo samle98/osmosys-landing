@@ -1,0 +1,7 @@
+# Archivos de video grandes — alojar en servicio externo para producción
+*.mp4
+*.MP4
+*.mov
+*.MOV
+*.avi
+*.mkv
