@@ -271,7 +271,34 @@
   transition: border-color .2s;
   appearance: none;
   -webkit-appearance: none;
+  cursor: none;        /* mantiene el cursor personalizado sobre los inputs */
 }
+
+/* ── Wrapper para input con botón interior (contraseña) ─── */
+.form-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.form-input-wrap .form-input {
+  padding-right: 48px; /* espacio para el botón */
+}
+
+.toggle-pw {
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 44px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent;
+  border: none;
+  border-left: 1px solid var(--line-2);
+  color: var(--ink-mute);
+  cursor: none;
+  transition: color .2s, border-color .2s;
+  flex-shrink: 0;
+}
+.toggle-pw:hover { color: var(--neon); border-color: var(--neon) }
 
 .form-input:focus,
 .form-textarea:focus,
