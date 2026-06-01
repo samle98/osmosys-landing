@@ -47,27 +47,27 @@
       color: #3693C8;
     }
 
-    /* ── Back link (aparece al hover en esquina) ───────────── */
+    /* ── Back link ─────────────────────────────────────────── */
     #back {
       position: fixed; top: 22px; left: 28px; z-index: 20;
       font-family: 'Courier New', monospace;
-      font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
-      color: #5a564e; text-decoration: none;
-      opacity: 0; transition: opacity .3s;
+      font-size: 13px; letter-spacing: .20em; text-transform: uppercase;
+      color: #e8e4dc; text-decoration: none;
+      text-shadow: 0 1px 6px rgba(0,0,0,.9);
+      opacity: 1; transition: color .2s;
     }
     #back:hover { color: #3693C8; }
-    body:hover #back { opacity: 1; }
 
     /* ── Info HUD (esquina inferior izquierda) ─────────────── */
     #hud {
-      position: fixed; bottom: 22px; left: 28px; z-index: 20;
+      position: fixed; bottom: 28px; left: 28px; z-index: 20;
       font-family: 'Courier New', monospace;
-      font-size: 10px; letter-spacing: .2em; line-height: 1.8;
-      color: #34322e;
+      font-size: 13px; letter-spacing: .18em; line-height: 2;
+      color: #c8c4bc;
+      text-shadow: 0 1px 6px rgba(0,0,0,.9);
       pointer-events: none;
-      opacity: 0; transition: opacity .3s;
+      opacity: 1;
     }
-    body:hover #hud { opacity: 1; }
   </style>
 </head>
 <body>
@@ -310,6 +310,10 @@
     }
     animate();
   </script>
+
+  <!-- Audio ambiente (se activa si el usuario lo tenía encendido en otra página) -->
+  <audio id="siteAudio" src="assets/SLEEPY%20BEATS.mp3" loop preload="none"></audio>
+  <script defer src="js/audio-toggle.js"></script>
 
 </body>
 </html>
