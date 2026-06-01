@@ -262,6 +262,8 @@
           tex.colorSpace  = THREE.SRGBColorSpace;
           tex.minFilter   = THREE.LinearFilter;
           tex.magFilter   = THREE.LinearFilter;
+          tex.rotation    = Math.PI / 2;   // corrige rotación 90° de las UV del modelo
+          tex.center.set(0.5, 0.5);        // rotar desde el centro
 
           // MeshBasicMaterial: sin lighting, video a brillo completo
           screenMesh.material = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
