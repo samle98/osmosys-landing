@@ -171,18 +171,24 @@
 
     const loader = new GLTFLoader();
     loader.load(
-      'assets/GALERIA_PRUEBA.glb',
+      'assets/GALERIA.glb',
 
       // onLoad
       (gltf) => {
         const model = gltf.scene;
+
+        // Listar todos los meshes en consola (útil para asignar texturas de video)
+        console.group('GALERIA.glb — meshes disponibles');
+        model.traverse(node => {
+          if (node.isMesh) console.log(`Mesh: "${node.name}" | Material: "${node.material?.name ?? '—'}"`);
+        });
+        console.groupEnd();
 
         // Activar sombras en todos los meshes del modelo
         model.traverse(node => {
           if (node.isMesh) {
             node.castShadow    = true;
             node.receiveShadow = true;
-            // Si el material es muy oscuro, aumentar algo el emissive
             if (node.material) {
               const m = node.material;
               if (Array.isArray(m)) m.forEach(mat => mat.envMapIntensity = 0.6);
