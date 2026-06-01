@@ -230,6 +230,46 @@
         sun.shadow.camera.bottom = -2;
         sun.shadow.camera.updateProjectionMatrix();
 
+        // ── Texturas de video ─────────────────────────────────
+        // Para producción: reemplazar la ruta local por la URL de Cloudflare R2.
+        // Pantallas con material "Video" en el modelo.
+        const VIDEO_SCREENS = [
+          // { mesh: 'Cube_1',    src: 'assets/VIDEO_SALA_X.mp4' },  // pendiente
+          { mesh: 'Cube001_1', src: 'assets/VIDEO_SALA_1.mp4' },
+          // { mesh: 'Cube002_1', src: 'assets/VIDEO_SALA_2.mp4' },  // pendiente
+          // { mesh: 'Cube003_1', src: 'assets/VIDEO_SALA_3.mp4' },  // pendiente
+        ];
+
+        VIDEO_SCREENS.forEach(({ mesh: meshName, src }) => {
+          const screenMesh = model.getObjectByName(meshName);
+          if (!screenMesh) { console.warn(`Mesh "${meshName}" no encontrado`); return; }
+
+          // Elemento <video> invisible — fuente de la textura
+          const vid = document.createElement('video');
+          vid.src         = src;
+          vid.loop        = true;
+          vid.muted       = true;      // obligatorio para autoplay sin gesto
+          vid.playsInline = true;
+          vid.crossOrigin = 'anonymous';
+
+          // Intentar play automático; si falla, esperar primer click del usuario
+          vid.play().catch(() => {
+            document.addEventListener('click', () => vid.play(), { once: true });
+          });
+
+          // Crear VideoTexture y aplicarla al mesh
+          const tex = new THREE.VideoTexture(vid);
+          tex.colorSpace  = THREE.SRGBColorSpace;
+          tex.minFilter   = THREE.LinearFilter;
+          tex.magFilter   = THREE.LinearFilter;
+
+          // MeshBasicMaterial: sin lighting, video a brillo completo
+          screenMesh.material = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
+          screenMesh.material.needsUpdate = true;
+
+          console.log(`✓ VideoTexture aplicada → "${meshName}" (${src})`);
+        });
+
         // Ocultar overlay de carga
         barFill.style.width = '100%';
         pctEl.textContent   = '100 %';
