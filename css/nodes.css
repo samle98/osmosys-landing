@@ -4,6 +4,7 @@
 
 .nodes-wrap{
   position:relative;
+  margin-top:74px;                /* clearance del navbar fijo (18px pad + ~38px contenido + 18px pad) */
   border-top:1px solid var(--line);
   border-bottom:1px solid var(--line);
   background:var(--bg-2);

@@ -1,16 +1,19 @@
-// audio-toggle.js — botón de audio del nav con persistencia entre páginas.
-// Guarda el estado en localStorage; si estaba activo al navegar, reanuda solo.
+// audio-toggle.js — audio del nav con persistencia entre páginas.
+// Landing: empieza silenciado, el usuario lo activa manualmente.
+// Laboratorio / Galería (data-audio-autoplay="true"): siempre arranca,
+// independientemente del estado guardado.
 
 (() => {
-  const audioBtn = document.getElementById('audioBtn');
-  const audio    = document.getElementById('siteAudio');
-  const KEY      = 'osm_audio_active';
+  const audioBtn  = document.getElementById('audioBtn');
+  const audio     = document.getElementById('siteAudio');
+  const KEY       = 'osm_audio_active';
+  const autoplay  = document.body.dataset.audioAutoplay === 'true';
 
   function setActive(active) {
     if (active) {
       audioBtn?.classList.remove('muted');
       audio?.play().catch(() => {
-        // El navegador rechazó el autoplay (sin gesto previo): volver a muted
+        // Navegador bloqueó el autoplay sin gesto previo
         audioBtn?.classList.add('muted');
         localStorage.setItem(KEY, '0');
       });
@@ -22,17 +25,21 @@
   }
 
   // ── Init ─────────────────────────────────────────────────
-  // Si el usuario ya lo había activado en otra página, reanudar
-  if (localStorage.getItem(KEY) === '1') {
+  if (autoplay) {
+    // Laboratorio y Galería: activar siempre (era silenciado o no)
+    setActive(true);
+  } else if (localStorage.getItem(KEY) === '1') {
+    // Otras páginas: respetar estado guardado
     setActive(true);
   } else {
-    audioBtn?.classList.add('muted'); // por defecto: silenciado
+    // Por defecto: silenciado
+    audioBtn?.classList.add('muted');
   }
 
   // ── Click del botón ───────────────────────────────────────
   audioBtn?.addEventListener('click', e => {
     e.preventDefault();
     const isMuted = audioBtn.classList.contains('muted');
-    setActive(isMuted); // si estaba muted → activar, y viceversa
+    setActive(isMuted);
   });
 })();
