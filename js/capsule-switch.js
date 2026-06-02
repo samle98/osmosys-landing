@@ -1,20 +1,35 @@
 // capsule-switch.js — cambio entre cápsulas 01–05 con
-// flicker de escaneo y actualización de los textos del hero.
+// flicker de escaneo, actualización del hero y modal de YouTube por cápsula.
 
 (() => {
+  // ── Datos por cápsula ─────────────────────────────────────
   const CAP = {
     '01': { title:'arte',    kicker:'MANIFIESTO',  lead:'Osmosys es un colectivo donde el <strong>arte</strong> y la <strong>tecnología</strong> se filtran entre sí. Cinco cápsulas para entrar a nuestro proceso — manifiesto, obras, laboratorio, comunidad, invitación.',
-            thumb: 'https://img.youtube.com/vi/NNCn_22HpJw/hqdefault.jpg', duration: '2:46' },
+            thumb: 'https://img.youtube.com/vi/9IiqtHUWKgw/hqdefault.jpg', duration: '2:46' },
     '02': { title:'obras',   kicker:'CREACIONES',  lead:'Doce piezas habitan un espacio panorámico de 360°. Entra, escucha, vuelve. Cada obra vive en su propio nicho dentro de la sala.',
-            thumb: '', duration: '' },
+            thumb: 'https://img.youtube.com/vi/nwRIBQsJpb4/hqdefault.jpg', duration: '' },
     '03': { title:'proceso', kicker:'LABORATORIO', lead:'Tres instrumentos abiertos en el navegador. Mueve, escucha, exporta. Lo que hagas queda guardado en el archivo del colectivo.',
-            thumb: '', duration: '' },
-    '04': { title:'voces',   kicker:'COMUNIDAD',   lead:'Foro y archivo vivo de 142 voces. 38 hilos activos sobre arte, código, errores y obsesiones compartidas.',
+            thumb: 'https://img.youtube.com/vi/2u3JWmbytHI/hqdefault.jpg', duration: '' },
+    '04': { title:'voces',   kicker:'COMUNIDAD',   lead:'Foro y archivo vivo de voces activas. Hilos abiertos sobre arte, código, errores y obsesiones compartidas.',
             thumb: '', duration: '' },
     '05': { title:'archivo', kicker:'ARCHIVO',     lead:'Todo lo que se crea aquí queda. El archivo colectivo de procesos, errores y experimentos del laboratorio.',
-            thumb: '', duration: '' },
+            thumb: 'https://img.youtube.com/vi/MqV8-YvxxGg/hqdefault.jpg', duration: '' },
   };
 
+  // ── Video IDs de YouTube por cápsula (null = aún no disponible) ──
+  const CAP_YT = {
+    '01': '9IiqtHUWKgw',
+    '02': 'nwRIBQsJpb4',
+    '03': '2u3JWmbytHI',
+    '04': null,
+    '05': 'MqV8-YvxxGg',
+  };
+
+  // Parámetros del embed: mínimo de UI de YouTube
+  // modestbranding + rel=0 + sin anotaciones/subtítulos automáticos
+  const YT_PARAMS = '?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3&cc_load_policy=0';
+
+  // ── Preview hero ──────────────────────────────────────────
   const previewFrame = document.querySelector('.preview-frame');
   const previewBr    = document.querySelector('.preview-br');
 
@@ -28,14 +43,14 @@
     if (previewBr) previewBr.textContent = CAP[n].duration || '';
   }
 
-  // Estado inicial: cap-01 activa
-  updatePreview('01');
+  updatePreview('01'); // estado inicial
 
+  // ── Cambio de cápsula ─────────────────────────────────────
   const scanFx = document.getElementById('scanFx');
   const nodes  = document.querySelectorAll('.node');
   const bodies = document.querySelectorAll('.cap-body');
 
-  function setCap(n){
+  function setCap(n) {
     scanFx.classList.remove('on');
     void scanFx.offsetWidth;
     scanFx.classList.add('on');
@@ -58,19 +73,20 @@
   nodes.forEach(n => n.addEventListener('click', () => setCap(n.dataset.cap)));
 
   // ── Modal YouTube ─────────────────────────────────────────
-  const YT_EMBED = 'https://www.youtube.com/embed/NNCn_22HpJw?autoplay=1&rel=0';
-  const ytModal  = document.getElementById('ytModal');
-  const ytFrame  = document.getElementById('ytFrame');
-  const ytClose  = document.getElementById('ytModalClose');
+  const ytModal = document.getElementById('ytModal');
+  const ytFrame = document.getElementById('ytFrame');
+  const ytClose = document.getElementById('ytModalClose');
 
   function openVideo() {
-    if (!ytModal) return;
-    ytFrame.src = YT_EMBED;      // autoplay al asignar src
+    const activeCapNum = document.querySelector('.node[data-active="true"]')?.dataset.cap ?? '01';
+    const videoId = CAP_YT[activeCapNum];
+    if (!videoId || !ytModal) return;   // cap sin video aún → no hacer nada
+    ytFrame.src = `https://www.youtube.com/embed/${videoId}${YT_PARAMS}`;
     ytModal.classList.add('on');
   }
 
   function closeVideo() {
-    ytFrame.src = '';             // vaciar src detiene el video sin recargar nada
+    ytFrame.src = '';                   // vaciar src detiene el video
     ytModal.classList.remove('on');
   }
 
@@ -82,7 +98,7 @@
   document.querySelector('.hero-cta .btn--neon')
     ?.addEventListener('click', openVideo);
 
-  // Tarjeta de preview del hero (click en la imagen de la derecha)
+  // Tarjeta de preview (click en la imagen lateral del hero)
   document.querySelector('.preview-frame')
     ?.addEventListener('click', openVideo);
 })();

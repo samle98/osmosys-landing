@@ -69,11 +69,15 @@
 .yt-iframe-wrap{
   position:relative;
   aspect-ratio:16/9;
+  overflow:hidden;               /* recorta la barra de título/canal de YouTube */
 }
 
 .yt-iframe-wrap iframe{
-  position:absolute;inset:0;
-  width:100%;height:100%;
+  position:absolute;
+  top:-56px;                     /* sube el iframe para ocultar la barra superior (~56px) */
+  left:0;
+  width:100%;
+  height:calc(100% + 56px);     /* compensa el desplazamiento */
   border:none;display:block;
 }
 
