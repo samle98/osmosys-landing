@@ -11,3 +11,4 @@ desktop.ini
 *.MOV
 # Excepciones: videos de galería comprimidos (< 100 MB)
 !assets/VIDEO_SALA_*.mp4
+!assets/VIDEO_SALA_*.mov
