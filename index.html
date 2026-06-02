@@ -65,9 +65,13 @@
       <a href="galeria.html">Galería 360</a>
       <a href="laboratorio.html">Laboratorio</a>
       <a href="foro.html">Foro</a>
-      <button class="audio-btn" id="audioBtn" aria-label="Audio del sitio" data-comment-anchor="70389dc826-button">
-        <span class="bars"><i></i><i></i><i></i><i></i></span>
-      </button>
+      <div class="audio-controls">
+        <input type="range" id="volumeSlider" class="volume-slider"
+          min="0" max="1" step="0.05" value="0.7" aria-label="Volumen">
+        <button class="audio-btn" id="audioBtn" aria-label="Audio del sitio">
+          <span class="bars"><i></i><i></i><i></i><i></i></span>
+        </button>
+      </div>
     </div>
   </nav>
 
@@ -118,12 +122,8 @@
         <span class="divider"></span>
         <span class="label-sm" data-cap-kicker>MANIFIESTO</span>
       </div>
-      <h1 class="hero-title">
-        Fusión <span class="accent" data-cap-title>arte</span><br>
-        <span class="line2">× código.</span>
-      </h1>
       <p class="hero-body" data-cap-lead>
-        Osmosys es un colectivo donde el <strong>arte</strong> y la <strong>tecnología</strong> se filtran entre sí. Cinco cápsulas para entrar a nuestro proceso — manifiesto, obras, laboratorio, comunidad, invitación.
+        Osmosys es un colectivo donde el arte y la tecnología se filtran entre sí. Cinco cápsulas para entrar a nuestro proceso — manifiesto, obras, laboratorio, comunidad, invitación.
       </p>
       <div class="hero-cta">
         <button class="btn btn--neon"><span class="play-icon"></span> Reproducir cápsula</button>
@@ -190,12 +190,7 @@
           <div class="pano-image" id="panoImage">
             <span class="crop tl"></span><span class="crop tr"></span>
             <span class="crop bl"></span><span class="crop br"></span>
-            <div class="ph-label">
-              <span>// imagen panorámica · 360°</span>
-              <span class="play-ring"><span class="play-icon"></span></span>
-              <span class="dim">placeholder · 4096 × 1024</span>
             </div>
-          </div>
           <div class="pano-hud">
             <div class="top">
               <span class="pano-tag live">GALERÍA · ESPACIO 360°</span>
@@ -216,20 +211,8 @@
         </div>
       </div>
 
-      <div class="cap-02-meta">
-        <div class="left">
-          <h3>Entra al espacio.<br>No es una galería plana.</h3>
-          <p>Las 12 piezas habitan una sala panorámica que reacciona a tu mirada. Cada obra vive en su propio nicho — entras, escuchas, vuelves.</p>
-          <div style="margin-top:24px;display:flex;gap:14px">
-            <a href="galeria.html" class="btn btn--neon">Explorar galería <span class="arrow">→</span></a>
-            <button class="btn">Ver índice</button>
-          </div>
-        </div>
-        <div class="stats">
-          <div class="stat"><div class="num">12</div><div class="lab">piezas</div></div>
-          <div class="stat"><div class="num">360°</div><div class="lab">espacio</div></div>
-          <div class="stat"><div class="num">24m</div><div class="lab">audio total</div></div>
-        </div>
+      <div style="margin-top:28px">
+        <a href="galeria.html" class="btn btn--neon">Explorar galería <span class="arrow">→</span></a>
       </div>
     </section>
 
@@ -400,6 +383,14 @@
     </div>
   </div>
 
+  <!-- SCROLL INDICATOR -->
+  <div class="scroll-hint" id="scrollHint">
+    <span class="scroll-hint-label">scroll</span>
+    <div class="scroll-hint-track">
+      <div class="scroll-hint-dot"></div>
+    </div>
+  </div>
+
   <!-- MODAL DE CRÉDITOS -->
   <div class="credits-modal" id="creditsModal">
     <div class="credits-box">
@@ -422,7 +413,7 @@
   </footer>
 
   <!-- Audio ambiente -->
-  <audio id="siteAudio" src="assets/SLEEPY%20BEATS.mp3" loop preload="none"></audio>
+  <audio id="siteAudio" src="assets/SONIDO.wav" loop preload="none"></audio>
 
   <!-- Scripts: orden por dependencia / DOM. defer para no bloquear el parser. -->
   <script defer src="js/cursor.js"></script>

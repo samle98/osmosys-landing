@@ -4,11 +4,11 @@
 (() => {
   // ── Datos por cápsula ─────────────────────────────────────
   const CAP = {
-    '01': { title:'arte',    kicker:'MANIFIESTO',  lead:'Osmosys es un colectivo donde el <strong>arte</strong> y la <strong>tecnología</strong> se filtran entre sí. Cinco cápsulas para entrar a nuestro proceso — manifiesto, obras, laboratorio, comunidad, invitación.',
+    '01': { title:'arte',    kicker:'MANIFIESTO',  lead:'Osmosys es un colectivo donde el arte y la tecnología se filtran entre sí. Cinco cápsulas para entrar a nuestro proceso — manifiesto, obras, laboratorio, comunidad, invitación.',
             thumb: 'https://img.youtube.com/vi/9IiqtHUWKgw/hqdefault.jpg', duration: '2:46' },
-    '02': { title:'obras',   kicker:'CREACIONES',  lead:'Doce piezas habitan un espacio panorámico de 360°. Entra, escucha, vuelve. Cada obra vive en su propio nicho dentro de la sala.',
+    '02': { title:'obras',   kicker:'CREACIONES',  lead:'Cuatro piezas habitan un espacio panorámico de 360°. Entra, escucha, vuelve. Cada obra aborda una técnica diferente del colectivo.',
             thumb: 'https://img.youtube.com/vi/nwRIBQsJpb4/hqdefault.jpg', duration: '' },
-    '03': { title:'proceso', kicker:'LABORATORIO', lead:'Tres instrumentos abiertos en el navegador. Mueve, escucha, exporta. Lo que hagas queda guardado en el archivo del colectivo.',
+    '03': { title:'proceso', kicker:'LABORATORIO', lead:'Tres instrumentos visuales abiertos en el navegador. Mueve, escucha, exporta. Lo que hagas queda guardado en el archivo del colectivo.',
             thumb: 'https://img.youtube.com/vi/2u3JWmbytHI/hqdefault.jpg', duration: '' },
     '04': { title:'voces',   kicker:'COMUNIDAD',   lead:'Foro y archivo vivo de voces activas. Hilos abiertos sobre arte, código, errores y obsesiones compartidas.',
             thumb: '', duration: '' },

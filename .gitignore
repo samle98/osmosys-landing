@@ -9,6 +9,10 @@ desktop.ini
 *.MP4
 *.mov
 *.MOV
+# Archivos de proyecto de audio (Ableton, etc.)
+*.asd
+*.als
+
 # Excepciones: videos de galería comprimidos (< 100 MB)
 !assets/VIDEO_SALA_*.mp4
 !assets/VIDEO_SALA_*.mov

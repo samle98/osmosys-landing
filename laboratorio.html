@@ -33,9 +33,13 @@
       <a href="galeria.html">Galería 360</a>
       <a href="laboratorio.html" class="active">Laboratorio</a>
       <a href="foro.html">Foro</a>
-      <button class="audio-btn" id="audioBtn" aria-label="Audio del sitio">
-        <span class="bars"><i></i><i></i><i></i><i></i></span>
-      </button>
+      <div class="audio-controls">
+        <input type="range" id="volumeSlider" class="volume-slider"
+          min="0" max="1" step="0.05" value="0.7" aria-label="Volumen">
+        <button class="audio-btn" id="audioBtn" aria-label="Audio del sitio">
+          <span class="bars"><i></i><i></i><i></i><i></i></span>
+        </button>
+      </div>
     </div>
   </nav>
 
@@ -180,7 +184,7 @@
   <script defer src="js/credits.js"></script>
 
   <!-- Audio ambiente -->
-  <audio id="siteAudio" src="assets/SLEEPY%20BEATS.mp3" loop preload="none"></audio>
+  <audio id="siteAudio" src="assets/SONIDO.wav" loop preload="none"></audio>
 
 </body>
 </html>

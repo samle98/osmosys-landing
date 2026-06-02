@@ -49,3 +49,61 @@
 
 @keyframes bar{50%{transform:scaleY(.4)}}
 @keyframes halo{0%,100%{transform:scale(1);opacity:.35}50%{transform:scale(1.18);opacity:0}}
+
+/* ── Control de volumen ──────────────────────────────────── */
+.audio-controls{
+  display:flex;align-items:center;gap:10px;
+}
+.volume-slider{
+  -webkit-appearance:none;appearance:none;
+  width:0;opacity:0;
+  height:2px;background:var(--line-2);
+  outline:none;cursor:none;
+  transition:width .3s ease, opacity .3s ease;
+  flex-shrink:0;
+}
+.audio-controls:hover .volume-slider{
+  width:72px;opacity:1;
+}
+.volume-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:10px;height:10px;
+  background:var(--neon);
+  box-shadow:0 0 6px var(--neon);
+  cursor:none;
+}
+.volume-slider::-moz-range-thumb{
+  width:10px;height:10px;
+  background:var(--neon);border:none;border-radius:0;
+  box-shadow:0 0 6px var(--neon);cursor:none;
+}
+
+/* ── Indicador de scroll ─────────────────────────────────── */
+.scroll-hint{
+  position:fixed;right:36px;bottom:48px;z-index:50;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  pointer-events:none;
+  opacity:1;transition:opacity .6s ease;
+}
+.scroll-hint.hidden{opacity:0}
+.scroll-hint-label{
+  writing-mode:vertical-rl;text-orientation:mixed;
+  font-family:var(--font-mono);font-size:9px;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--ink-mute);
+}
+.scroll-hint-track{
+  width:1px;height:50px;background:var(--line-2);
+  position:relative;overflow:hidden;
+}
+.scroll-hint-dot{
+  position:absolute;left:-1px;
+  width:3px;height:14px;
+  background:var(--neon);border-radius:2px;
+  animation:scrollDrop 1.8s ease-in-out infinite;
+}
+@keyframes scrollDrop{
+  0%  {top:-14px;opacity:0}
+  20% {opacity:1}
+  80% {opacity:1}
+  100%{top:50px;opacity:0}
+}
