@@ -88,17 +88,18 @@
 .scroll-hint.hidden{opacity:0}
 .scroll-hint-label{
   writing-mode:vertical-rl;text-orientation:mixed;
-  font-family:var(--font-mono);font-size:9px;letter-spacing:.3em;text-transform:uppercase;
-  color:var(--ink-mute);
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--ink-dim);
 }
 .scroll-hint-track{
-  width:1px;height:50px;background:var(--line-2);
+  width:2px;height:60px;background:var(--line);
   position:relative;overflow:hidden;
 }
 .scroll-hint-dot{
   position:absolute;left:-1px;
-  width:3px;height:14px;
+  width:4px;height:18px;
   background:var(--neon);border-radius:2px;
+  box-shadow:0 0 8px var(--neon);
   animation:scrollDrop 1.8s ease-in-out infinite;
 }
 @keyframes scrollDrop{
