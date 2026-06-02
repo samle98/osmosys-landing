@@ -85,7 +85,7 @@
   <!-- HUD mínimo -->
   <div id="hud">
     arrastra para orbitar &nbsp;·&nbsp; scroll para zoom<br>
-    shift + arrastra para desplazar
+    click en una pantalla para reproducir / pausar
   </div>
 
   <!-- Three.js importmap -->
@@ -102,6 +102,13 @@
     import * as THREE               from 'three';
     import { GLTFLoader }           from 'three/addons/loaders/GLTFLoader.js';
     import { OrbitControls }        from 'three/addons/controls/OrbitControls.js';
+
+    // ── Estado de videos / raycasting ─────────────────────────
+    const raycaster    = new THREE.Raycaster();
+    const pointer      = new THREE.Vector2();
+    const videoEntries = [];   // { mesh, video } — se llena al cargar el GLB
+    let   isDragging   = false;
+    let   mouseDownX   = 0, mouseDownY = 0;
     import { RGBELoader }           from 'three/addons/loaders/RGBELoader.js';
 
     // ── Renderer ────────────────────────────────────────────
@@ -233,7 +240,7 @@
         // ── Texturas de video ─────────────────────────────────
         // Para producción: reemplazar la ruta local por la URL de Cloudflare R2.
         // Pantallas con material "Video" en el modelo.
-        // Carga escalonada: 1 video cada 1.2 s para no saturar ancho de banda
+        // ── Texturas de video: click para reproducir, uno a la vez ──
         const VIDEO_SCREENS = [
           { mesh: 'Cube001_1', src: 'assets/VIDEO_SALA_1.mp4' },
           { mesh: 'Cube002_1', src: 'assets/VIDEO_SALA_2.mp4' },
@@ -241,35 +248,67 @@
           { mesh: 'Cube_1',    src: 'assets/VIDEO_SALA_4.mp4' },
         ];
 
-        VIDEO_SCREENS.forEach(({ mesh: meshName, src }, index) => {
+        VIDEO_SCREENS.forEach(({ mesh: meshName, src }) => {
           const screenMesh = model.getObjectByName(meshName);
           if (!screenMesh) { console.warn(`Mesh "${meshName}" no encontrado`); return; }
 
-          setTimeout(() => {
-            const vid = document.createElement('video');
-            vid.src         = src;
-            vid.loop        = true;
-            vid.muted       = true;
-            vid.playsInline = true;
-            // crossOrigin solo si el video está en dominio externo (CDN)
-            // vid.crossOrigin = 'anonymous';
+          const vid = document.createElement('video');
+          vid.src         = src;
+          vid.loop        = true;
+          vid.muted       = true;
+          vid.playsInline = true;
+          vid.preload     = 'none'; // no bufferear hasta que el usuario haga click
 
-            vid.play().catch(() => {
-              document.addEventListener('click', () => vid.play(), { once: true });
-            });
+          const tex = new THREE.VideoTexture(vid);
+          tex.colorSpace      = THREE.SRGBColorSpace;
+          tex.minFilter       = THREE.LinearFilter;
+          tex.magFilter       = THREE.LinearFilter;
+          tex.generateMipmaps = false;
+          tex.rotation        = Math.PI / 2;
+          tex.center.set(0.5, 0.5);
 
-            const tex = new THREE.VideoTexture(vid);
-            tex.colorSpace      = THREE.SRGBColorSpace;
-            tex.minFilter       = THREE.LinearFilter;
-            tex.magFilter       = THREE.LinearFilter;
-            tex.generateMipmaps = false;              // sin mipmaps: menos memoria GPU
-            tex.rotation        = Math.PI / 2;
-            tex.center.set(0.5, 0.5);
+          screenMesh.material = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
+          screenMesh.material.needsUpdate = true;
 
-            screenMesh.material = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
-            screenMesh.material.needsUpdate = true;
-            console.log(`✓ VideoTexture [${index + 1}/4] → "${meshName}"`);
-          }, index * 1200); // 0 ms · 1200 ms · 2400 ms · 3600 ms
+          videoEntries.push({ mesh: screenMesh, video: vid });
+          console.log(`✓ Pantalla lista (paused) → "${meshName}"`);
+        });
+
+        // ── Raycasting: detectar click en pantallas ──────────────
+        renderer.domElement.addEventListener('mousedown', e => {
+          isDragging = false;
+          mouseDownX = e.clientX;
+          mouseDownY = e.clientY;
+        });
+        renderer.domElement.addEventListener('mousemove', e => {
+          if (Math.abs(e.clientX - mouseDownX) > 4 || Math.abs(e.clientY - mouseDownY) > 4) isDragging = true;
+        });
+        renderer.domElement.addEventListener('click', e => {
+          if (isDragging) return; // fue un drag (órbita), no un click
+
+          const rect = renderer.domElement.getBoundingClientRect();
+          pointer.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1;
+          pointer.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1;
+
+          raycaster.setFromCamera(pointer, camera);
+          const hits = raycaster.intersectObjects(videoEntries.map(v => v.mesh), false);
+          if (!hits.length) return;
+
+          const clicked  = hits[0].object;
+          const entry    = videoEntries.find(v => v.mesh === clicked);
+          if (!entry) return;
+
+          const wasPlaying = !entry.video.paused;
+
+          // Pausar todos los demás
+          videoEntries.forEach(v => { if (v !== entry) v.video.pause(); });
+
+          // Toggle: si estaba pausado → play; si estaba jugando → pause
+          if (wasPlaying) {
+            entry.video.pause();
+          } else {
+            entry.video.play().catch(() => {});
+          }
         });
 
         // Ocultar overlay de carga
