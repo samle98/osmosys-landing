@@ -4,15 +4,15 @@
 (() => {
   // ── Datos por cápsula ─────────────────────────────────────
   const CAP = {
-    '01': { title:'arte',    kicker:'MANIFIESTO',  lead:'Osmosys es un colectivo donde el arte y la tecnología se filtran entre sí. Cinco cápsulas para entrar a nuestro proceso — manifiesto, obras, laboratorio, comunidad, invitación.',
+    '01': { name:'MANIFIESTO.', title:'arte',    kicker:'MANIFIESTO',  lead:'Osmosys es un colectivo donde el arte y la tecnología se filtran entre sí. Cinco cápsulas para entrar a nuestro proceso — manifiesto, obras, laboratorio, comunidad, invitación.',
             thumb: 'https://img.youtube.com/vi/9IiqtHUWKgw/hqdefault.jpg', duration: '2:46' },
-    '02': { title:'obras',   kicker:'CREACIONES',  lead:'Cuatro piezas habitan un espacio panorámico de 360°. Entra, escucha, vuelve. Cada obra aborda una técnica diferente del colectivo.',
+    '02': { name:'CREACIONES.', title:'obras',   kicker:'CREACIONES',  lead:'Cuatro piezas habitan un espacio panorámico de 360°. Entra, escucha, vuelve. Cada obra aborda una técnica diferente del colectivo.',
             thumb: 'https://img.youtube.com/vi/nwRIBQsJpb4/hqdefault.jpg', duration: '' },
-    '03': { title:'proceso', kicker:'LABORATORIO', lead:'Tres instrumentos visuales abiertos en el navegador. Mueve, escucha, exporta. Lo que hagas queda guardado en el archivo del colectivo.',
+    '03': { name:'PROCESO.',    title:'proceso', kicker:'LABORATORIO', lead:'Tres instrumentos visuales abiertos en el navegador. Mueve, escucha, exporta. Lo que hagas queda guardado en el archivo del colectivo.',
             thumb: 'https://img.youtube.com/vi/2u3JWmbytHI/hqdefault.jpg', duration: '' },
-    '04': { title:'voces',   kicker:'COMUNIDAD',   lead:'Foro y archivo vivo de voces activas. Hilos abiertos sobre arte, código, errores y obsesiones compartidas.',
+    '04': { name:'COMUNIDAD.',  title:'voces',   kicker:'COMUNIDAD',   lead:'Foro y archivo vivo de voces activas. Hilos abiertos sobre arte, código, errores y obsesiones compartidas.',
             thumb: '', duration: '' },
-    '05': { title:'archivo', kicker:'ARCHIVO',     lead:'Todo lo que se crea aquí queda. El archivo colectivo de procesos, errores y experimentos del laboratorio.',
+    '05': { name:'ARCHIVO.',    title:'archivo', kicker:'ARCHIVO',     lead:'Todo lo que se crea aquí queda. El archivo colectivo de procesos, errores y experimentos del laboratorio.',
             thumb: 'https://img.youtube.com/vi/MqV8-YvxxGg/hqdefault.jpg', duration: '' },
   };
 
@@ -44,6 +44,7 @@
   }
 
   updatePreview('01'); // estado inicial
+  document.querySelectorAll('[data-cap-name]').forEach(el => el.textContent = CAP['01'].name);
 
   // ── Cambio de cápsula ─────────────────────────────────────
   const scanFx = document.getElementById('scanFx');
@@ -63,6 +64,7 @@
         else b.removeAttribute('data-active');
       });
       document.querySelectorAll('[data-cap-num]').forEach(el => el.textContent = n);
+      document.querySelectorAll('[data-cap-name]').forEach(el  => el.textContent = CAP[n].name);
       document.querySelectorAll('[data-cap-title]').forEach(el => el.textContent = CAP[n].title);
       document.querySelectorAll('[data-cap-kicker]').forEach(el => el.textContent = CAP[n].kicker);
       document.querySelectorAll('[data-cap-lead]').forEach(el => el.innerHTML = CAP[n].lead);
